@@ -18,6 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import isotipo from "../img/isotipo_.png";
+import { AccesService } from "@/app/backend/acces";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,19 +34,32 @@ export default function LoginPage() {
     const username = formData.get("username") as string;
     const password = formData.get("password") as string;
 
+    const accesService = new AccesService();
+
     try {
-      // Simulate authentication - replace with actual API call
-      if (username === "admin" && password === "admin") {
-        // Set cookie for authentication
+      const isAuthenticated = await accesService.login({ username, password });
+
+      if (isAuthenticated) {
         document.cookie = "auth_token=authenticated; path=/; max-age=86400";
         router.push("/dashboard");
       } else {
         setError("Credenciales inválidas. Intente nuevamente.");
       }
-    } catch (err) {
-      setError("Error al iniciar sesión. Intente nuevamente.");
+    } catch (err: any) {
+      setError(err.message || "Error al iniciar sesión. Intente nuevamente.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const accesService = new AccesService();
+      await accesService.logout();
+      document.cookie = "auth_token=; path=/; max-age=0";
+      router.push("/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
     }
   };
 
@@ -58,6 +72,7 @@ export default function LoginPage() {
               src={isotipo}
               alt="PharmaGuide Logo"
               className="h-20 w-20 object-contain"
+              priority
             />
           </div>
           <CardTitle className="text-2xl font-bold text-green-700">
