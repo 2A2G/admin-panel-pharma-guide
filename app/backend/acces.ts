@@ -1,5 +1,4 @@
 import axios from "axios";
-import { NextResponse } from "next/server";
 
 const urlBase = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
 
