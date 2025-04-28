@@ -19,6 +19,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import isotipo from "../app/img/isotipo_.png";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { AccesService } from "@/app/backend/acces";
 
 interface NavItem {
   title: string;
@@ -65,8 +67,20 @@ const items: NavItem[] = [
 ];
 
 export function MainNav() {
+  const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const accesService = new AccesService();
+      await accesService.logout();
+      document.cookie = "auth_token=; path=/; max-age=0";
+      router.push("/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
   return (
     <>
@@ -119,11 +133,7 @@ export function MainNav() {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => {
-                  document.cookie =
-                    "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                  window.location.href = "/login";
-                }}
+                onClick={handleLogout}
               >
                 Cerrar Sesión
               </Button>
@@ -171,11 +181,7 @@ export function MainNav() {
           <Button
             variant="outline"
             className="w-full justify-start"
-            onClick={() => {
-              document.cookie =
-                "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-              window.location.href = "/login";
-            }}
+            onClick={handleLogout}
           >
             Cerrar Sesión
           </Button>

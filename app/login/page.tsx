@@ -52,6 +52,17 @@ export default function LoginPage() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const accesService = new AccesService();
+      await accesService.logout();
+      document.cookie = "auth_token=; path=/; max-age=0";
+      router.push("/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
       <Card className="w-full max-w-md shadow-lg">
@@ -61,6 +72,7 @@ export default function LoginPage() {
               src={isotipo}
               alt="PharmaGuide Logo"
               className="h-20 w-20 object-contain"
+              priority
             />
           </div>
           <CardTitle className="text-2xl font-bold text-green-700">
