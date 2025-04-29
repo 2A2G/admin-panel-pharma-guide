@@ -18,7 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import isotipo from "../img/isotipo_.png";
-import { AccesService } from "@/app/backend/acces";
+import { AccesService } from "@/app/backend/access/acces";
 
 export default function LoginPage() {
   const router = useRouter();
