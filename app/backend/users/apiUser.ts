@@ -1,0 +1,35 @@
+import axios from "axios";
+import { AccessTokenService } from "../../api/accesToken";
+
+const urlBas = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
+const urlBase = `${urlBas}/api/pharma-guide/users`;
+
+export class UserService {
+  async getUser() {
+    console.log("Fetching user data...");
+    try {
+      const token = await AccessTokenService.getToken();
+      if (!token) {
+        throw new Error("No se encontró el token de autenticación.");
+      }
+
+      const response = await axios.get(`${urlBase}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        const user = response.data;
+        if (!user) {
+          throw new Error("Usuario no encontrado");
+        }
+        return user;
+      } else {
+        throw new Error("Error en la respuesta del servidor.");
+      }
+    } catch (error: any) {
+      throw new Error(error?.message || "Error al obtener el usuario.");
+    }
+  }
+}

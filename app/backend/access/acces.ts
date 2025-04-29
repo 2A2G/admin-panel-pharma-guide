@@ -1,10 +1,9 @@
 import axios from "axios";
-import { NextResponse } from "next/server";
 
 const urlBase = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
 
 export class AccesService {
-  private url = `${urlBase}/access/pharma-guide/login`;
+  private url = `${urlBase}/api/access/pharma-guide/login`;
 
   async login(credentials: { username: string; password: string }) {
     try {

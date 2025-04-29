@@ -20,7 +20,7 @@ import { useState } from "react";
 import isotipo from "../app/img/isotipo_.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { AccesService } from "@/app/backend/acces";
+import { AccesService } from "@/app/backend/access/acces";
 
 interface NavItem {
   title: string;
