@@ -40,8 +40,8 @@ const items: NavItem[] = [
     icon: <Image src={isotipo} alt="Isotipo" className="h-5 w-5" />,
   },
   {
-    title: "Categorías",
-    href: "/dashboard/categorias",
+    title: "Plan de Estudios",
+    href: "/dashboard/plan-estudios",
     icon: <Package className="h-5 w-5" />,
   },
   {
