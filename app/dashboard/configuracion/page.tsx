@@ -1,7 +1,43 @@
 "use client";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { roleService } from "@/app/backend/roles/apiRole";
+import { useEffect, useState } from "react";
+import LoadingCircles from "@/components/ui/loading";
 export default function ConfiguracionPage() {
+  interface Role {
+    id: number;
+    name: string;
+  }
+
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const role = new roleService();
+      setLoading(true);
+      try {
+        const response = await role.getRole();
+        setRoles(response);
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <LoadingCircles />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
