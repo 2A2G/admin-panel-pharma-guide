@@ -14,6 +14,7 @@ import {
   Settings,
   LogOut,
   Menu,
+  Bot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -36,9 +37,9 @@ const items: NavItem[] = [
     icon: <LayoutDashboard className="h-5 w-5 text-green-600" />,
   },
   {
-    title: "Medicamentos",
-    href: "/dashboard/medicamentos",
-    icon: <PillIcon className="h-5 w-5 text-green-600" />,
+    title: "Usuarios",
+    href: "/dashboard/usuarios",
+    icon: <Users className="h-5 w-5 text-green-600" />,
   },
   {
     title: "Plan de Estudios",
@@ -46,9 +47,9 @@ const items: NavItem[] = [
     icon: <GraduationCap className="h-5 w-5 text-green-600" />,
   },
   {
-    title: "Usuarios",
-    href: "/dashboard/usuarios",
-    icon: <Users className="h-5 w-5 text-green-600" />,
+    title: "Medicamentos",
+    href: "/dashboard/medicamentos",
+    icon: <PillIcon className="h-5 w-5 text-green-600" />,
   },
   {
     title: "Contenido",
@@ -59,6 +60,11 @@ const items: NavItem[] = [
     title: "Estadísticas",
     href: "/dashboard/estadisticas",
     icon: <BarChart3 className="h-5 w-5 text-green-600" />,
+  },
+  {
+    title: "Gestión de IA",
+    href: "/dashboard/ia",
+    icon: <Bot className="h-5 w-5 text-green-600" />,
   },
   {
     title: "Configuración",
