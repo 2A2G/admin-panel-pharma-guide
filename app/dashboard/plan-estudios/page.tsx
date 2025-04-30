@@ -18,7 +18,7 @@ import { useEffect } from "react";
 import { StudyPlanService } from "@/app/backend/studyPlan/apiStudyPlan";
 import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
-import EditModal from "@/components/ui/EditModal";
+import EditModal from "@/components/ui/editModal";
 
 export default function PlanEstudiosPage() {
   interface StudyPlan {
