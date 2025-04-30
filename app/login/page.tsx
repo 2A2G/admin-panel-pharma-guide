@@ -123,9 +123,26 @@ export default function LoginPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-center text-sm text-muted-foreground">
-          PharmaGuide © {new Date().getFullYear()} - Todos los derechos
-          reservados
+        <CardFooter className="text-center text-sm text-muted-foreground flex flex-col gap-1">
+          <span>
+            PharmaGuide © {new Date().getFullYear()} - Todos los derechos
+            reservados
+          </span>
+          <span className="text-xs">
+            By{" "}
+            <span className="font-medium text-green-700">
+              Aldair Gutierrez Guerrero
+            </span>{" "}
+            ·{" "}
+            <a
+              href="https://github.com/2A2G"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-green-800"
+            >
+              GitHub: 2A2G
+            </a>
+          </span>
         </CardFooter>
       </Card>
     </div>
