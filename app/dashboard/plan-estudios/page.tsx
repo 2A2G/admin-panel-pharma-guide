@@ -26,6 +26,7 @@ import { useEffect } from "react";
 import { StudyPlanService } from "@/app/backend/studyPlan/apiStudyPlan";
 import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
+import EditModal from "@/components/ui/EditModal";
 
 export default function PlanEstudiosPage() {
   interface StudyPlan {
@@ -38,8 +39,28 @@ export default function PlanEstudiosPage() {
     isDeleted: boolean;
   }
 
+  const editFields = [
+    { name: "subjet_name", label: "Tema de Estudio", type: "text" as const },
+    { name: "total_days", label: "Total de días", type: "number" as const },
+    { name: "daily_hour", label: "Horas por día", type: "number" as const },
+    {
+      name: "isDeleted",
+      label: "Estado",
+      type: "select" as const,
+      options: [
+        { label: "Activo", value: "false" },
+        { label: "Inactivo", value: "true" },
+      ],
+    },
+  ];
+
   const [studyPlan, setStudyPlan] = useState<StudyPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<Record<string, any> | null>(
+    null
+  );
+
   const usersPerPage = 10;
 
   useEffect(() => {
@@ -57,6 +78,11 @@ export default function PlanEstudiosPage() {
     };
     fetchStudyPlans();
   }, []);
+
+  const handleEdit = (plan: Record<string, any>) => {
+    setCurrentPlan(plan);
+    setIsEditModalOpen(true);
+  };
 
   const totalStudyPlans = studyPlan.length;
   const totalPages = Math.ceil(totalStudyPlans / usersPerPage);
@@ -132,10 +158,15 @@ export default function PlanEstudiosPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(plan)}
+                      >
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Editar</span>
                       </Button>
+
                       <Button variant="ghost" size="icon">
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Eliminar</span>
@@ -146,6 +177,26 @@ export default function PlanEstudiosPage() {
               ))}
             </TableBody>
           </Table>
+          {currentPlan && (
+            <EditModal
+              title="Editar Plan de Estudio"
+              description="Modifica los datos del plan."
+              fields={editFields}
+              data={currentPlan}
+              isOpen={isEditModalOpen}
+              setIsOpen={setIsEditModalOpen}
+              onSubmit={(updatedData) => {
+                const cleanedData = {
+                  ...updatedData,
+                  isDeleted: updatedData.isDeleted === "true",
+                };
+
+                console.log("Datos actualizados:", cleanedData);
+                setCurrentPlan(null);
+              }}
+              triggerButton={false}
+            />
+          )}
         </div>
         <div className="flex items-center justify-between px-4 py-4 border-t">
           <div className="text-sm text-muted-foreground">
