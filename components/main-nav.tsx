@@ -15,6 +15,8 @@ import {
   LogOut,
   Menu,
   Bot,
+  Syringe,
+  FlaskConical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -47,9 +49,9 @@ const items: NavItem[] = [
     icon: <GraduationCap className="h-5 w-5 text-green-600" />,
   },
   {
-    title: "Medicamentos",
-    href: "/dashboard/medicamentos",
-    icon: <PillIcon className="h-5 w-5 text-green-600" />,
+    title: "Fármacos",
+    href: "/dashboard/farmacos",
+    icon: <FlaskConical className="h-5 w-5 text-green-600" />,
   },
   {
     title: "Contenido",
