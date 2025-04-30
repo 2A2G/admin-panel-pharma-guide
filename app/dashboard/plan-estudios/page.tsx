@@ -12,15 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Edit,
-  Plus,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit, Search, Trash2 } from "lucide-react";
 
 import { useEffect } from "react";
 import { StudyPlanService } from "@/app/backend/studyPlan/apiStudyPlan";

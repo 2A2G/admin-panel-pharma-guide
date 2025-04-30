@@ -6,7 +6,7 @@ const LoadingCircles = ({ color = "#3B82F6" }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActive((prev) => (prev + 1) % 3);
-    }, 400); // Reducimos el intervalo para un movimiento más dinámico
+    }, 500);
     return () => clearInterval(interval);
   }, []);
 
