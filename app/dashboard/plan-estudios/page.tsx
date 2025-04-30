@@ -30,9 +30,10 @@ import LoadingCircles from "@/components/ui/loading";
 export default function PlanEstudiosPage() {
   interface StudyPlan {
     id: number;
-    full_name: string;
-    email: string;
-    role: { name: string };
+    subjet_name: string;
+    daily_hour: string;
+    total_days: string;
+    user: { full_name: string };
     createdAt: string;
     isDeleted: boolean;
   }
@@ -45,10 +46,11 @@ export default function PlanEstudiosPage() {
     const fetchStudyPlans = async () => {
       const studyPlanService = new StudyPlanService();
       try {
-        const studyPlan = await studyPlanService.getStudyPlan();
-        setStudyPlan(studyPlan.data);
+        const plans = await studyPlanService.getStudyPlan();
+        setStudyPlan(plans);
       } catch (error) {
-        console.error("Error al obtener el usuario:", error);
+        // console.error("Error al obtener el plan de estudios:", error);
+        setStudyPlan([]);
       } finally {
         setLoading(false);
       }
@@ -101,31 +103,31 @@ export default function PlanEstudiosPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]">ID</TableHead>
-                <TableHead className="min-w-[150px]">Nombre</TableHead>
-                <TableHead className="min-w-[150px]">Email</TableHead>
-                <TableHead>Rol</TableHead>
-                <TableHead>Fecha de registro</TableHead>
+                <TableHead className="min-w-[150px]">Tema de Estudio</TableHead>
+                <TableHead className="min-w-[150px]">Usuario</TableHead>
+                <TableHead className="min-w-[150px]">Total de días</TableHead>
+                <TableHead className="min-w-[150px]">Horas por día</TableHead>
+                <TableHead className="min-w-[150px]">
+                  Fecha de registro
+                </TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {currentStudyPlans.map((usuario) => (
-                <TableRow key={usuario.id}>
-                  <TableCell className="font-medium">{usuario.id}</TableCell>
-                  <TableCell className="min-w-[150px]">
-                    {usuario.full_name}
-                  </TableCell>
-                  <TableCell>{usuario.email}</TableCell>
-                  <TableCell>{usuario.role.name}</TableCell>
+              {currentStudyPlans.map((plan) => (
+                <TableRow key={plan.id}>
+                  <TableCell className="font-medium">{plan.id}</TableCell>
+                  <TableCell>{plan.subjet_name}</TableCell>
+                  <TableCell>{plan.user.full_name}</TableCell>
+                  <TableCell>{plan.total_days}</TableCell>
+                  <TableCell>{plan.daily_hour}</TableCell>
                   <TableCell>
-                    {new Date(usuario.createdAt).toLocaleDateString("es-ES")}
+                    {new Date(plan.createdAt).toLocaleDateString("es-ES")}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={usuario.isDeleted ? "secondary" : "success"}
-                    >
-                      {usuario.isDeleted ? "Inactivo" : "Activo"}
+                    <Badge variant={plan.isDeleted ? "secondary" : "success"}>
+                      {plan.isDeleted ? "Inactivo" : "Activo"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
