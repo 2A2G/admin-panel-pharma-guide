@@ -19,11 +19,11 @@ export class roleService {
       });
 
       if (response.status === 200) {
-        const role = response.data;
-        if (!role) {
+        const roles = response.data.role;
+        if (!roles) {
           throw new Error("Rol no encontrado");
         }
-        return role;
+        return roles;
       } else {
         throw new Error("Error en la respuesta del servidor.");
       }
