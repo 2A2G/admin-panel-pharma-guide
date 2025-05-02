@@ -20,12 +20,12 @@ const editFields = [
   {
     name: "name",
     label: "Nombre del rol",
-    type: "text",
+    type: "text" as "text",
   },
   {
     name: "isDeleted",
     label: "Estado",
-    type: "select",
+    type: "select" as "select",
     options: [
       { value: "false", label: "Activo" },
       { value: "true", label: "Inactivo" },
@@ -149,33 +149,47 @@ export default function RoleTable() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <EditModal
-                          title="Editar Rol"
-                          description="Modifica los datos del rol."
-                          fields={editFields}
-                          data={{
-                            ...rol,
-                            isDeleted: rol.status?.isDeleted ? "true" : "false",
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsEditModalOpen(true)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                        {isEditModalOpen && (
+                          <EditModal
+                            title="Editar Rol"
+                            description="Modifica los datos del rol."
+                            fields={editFields}
+                            data={{
+                              ...rol,
+                              // Convertir el valor booleano de isDeleted a cadena de texto
+                              isDeleted: rol.status?.isDeleted
+                                ? "true"
+                                : "false",
+                            }}
+                            isOpen={isEditModalOpen}
+                            setIsOpen={setIsEditModalOpen}
+                            onSubmit={(updatedData) => {
+                              const cleanedData = {
+                                ...updatedData,
+                                // Convertir el valor de isDeleted a booleano al recibir el dato
+                                isDeleted: updatedData.isDeleted === "true",
+                              };
+                              console.log("Datos actualizados:", cleanedData);
+                              setCurrentRol(null);
+                            }}
+                          />
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Eliminar"
+                          onClick={() => {
+                            console.log("Eliminando rol", rol.id);
                           }}
-                          isOpen={isEditModalOpen}
-                          setIsOpen={setIsEditModalOpen}
-                          onSubmit={(updatedData) => {
-                            const cleanedData = {
-                              ...updatedData,
-                              isDeleted: updatedData.isDeleted === "true",
-                            };
-                            console.log("Datos actualizados:", cleanedData);
-                            setCurrentRol(null);
-                          }}
-                          triggerButton={
-                            <Button variant="ghost" size="icon">
-                              <Pencil className="h-4 w-4" />
-                              <span className="sr-only">Editar</span>
-                            </Button>
-                          }
-                        />
-
-                        <Button variant="ghost" size="icon">
+                        >
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Eliminar</span>
                         </Button>
