@@ -54,12 +54,17 @@ interface updateRole {
   idStatus: number;
 }
 
+interface CreateRole {
+  name: string;
+}
+
 export default function RoleTable() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const fetchRoles = async () => {
     const role = new roleService();
@@ -132,6 +137,30 @@ export default function RoleTable() {
     }
   };
 
+  const handelCreateRole = async ({ name }: CreateRole) => {
+    const newRol = new roleService();
+    setLoading(true);
+    try {
+      const response = await newRol.createRole(name);
+      if (response) {
+        setModalMessage("Rol creado correctamente");
+        setModalOpen(true);
+        await fetchRoles();
+        setIsAddModalOpen(false);
+      } else {
+        setModalMessage("Error al crear el rol");
+        setModalOpen(true);
+        console.error("Error al crear el rol:", response);
+      }
+    } catch (error) {
+      setModalMessage("Error inesperado al crear el rol");
+      setModalOpen(true);
+      console.error("Error al crear el rol:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
@@ -170,7 +199,25 @@ export default function RoleTable() {
           <Card className="flex-1 min-w-[350px]">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Roles</h2>
-              <Button>Agregar Rol</Button>
+              <Button onClick={() => setIsAddModalOpen(true)}>
+                Agregar Rol
+              </Button>
+
+              {isAddModalOpen && (
+                <EditModal
+                  title="Agregar Rol"
+                  description="Ingresa el nombre del nuevo rol."
+                  fields={[
+                    { name: "name", label: "Nombre del Rol", type: "text" },
+                  ]}
+                  data={{ name: "" }}
+                  isOpen={isAddModalOpen}
+                  setIsOpen={setIsAddModalOpen}
+                  onSubmit={(formData: Record<string, any>) =>
+                    handelCreateRole(formData as CreateRole)
+                  }
+                />
+              )}
             </div>
             <div className="overflow-auto">
               <Table>
