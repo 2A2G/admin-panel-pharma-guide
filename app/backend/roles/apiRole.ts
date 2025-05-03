@@ -31,4 +31,28 @@ export class roleService {
       throw new Error(error?.message || "Error al obtener el rol.");
     }
   }
+
+  async deleteRole(id: number) {
+    try {
+      const token = await AccessTokenService.getToken();
+      if (!token) {
+        throw new Error("No se encontró el token de autenticación.");
+      }
+
+      const response = await axios.delete(`${urlBase}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: { id },
+      });
+
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Error en la respuesta del servidor.");
+      }
+    } catch (error: any) {
+      throw new Error(error?.message || "Error al eliminar el rol.");
+    }
+  }
 }

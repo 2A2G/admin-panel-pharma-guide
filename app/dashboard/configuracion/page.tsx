@@ -28,7 +28,7 @@ const editFields = [
     type: "select" as "select",
     options: [
       { value: "false", label: "Activo" },
-      { value: "true", label: "Inactivo" },
+      { value: "true", label: "Eliminado" },
     ],
   },
 ];
@@ -59,6 +59,7 @@ export default function RoleTable() {
       try {
         const response = await role.getRole();
 
+        console.log("Respuesta de roles:", response); // Log the response
         if (Array.isArray(response)) {
           setRoles(response);
         } else if (response.data && Array.isArray(response.data)) {
@@ -75,6 +76,23 @@ export default function RoleTable() {
 
     fetchRoles();
   }, []);
+
+  const handelDeleteRole = async (id: number) => {
+    const role = new roleService();
+    setLoading(true);
+    try {
+      const response = await role.deleteRole(id);
+      if (response) {
+        setRoles((prevRoles) => prevRoles.filter((rol) => rol.id !== id));
+      } else {
+        console.error("Error al eliminar el rol:", response);
+      }
+    } catch (error) {
+      console.error("Error al eliminar el rol:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -141,10 +159,12 @@ export default function RoleTable() {
                     <TableCell>
                       <span
                         className={`px-2 py-1 rounded text-white ${
-                          rol.status.isDeleted ? "bg-gray-500" : "bg-green-500"
+                          rol.status.name === "deleted"
+                            ? "bg-red-500"
+                            : "bg-green-500"
                         }`}
                       >
-                        {rol.status.isDeleted ? "Inactivo" : "Activo"}
+                        {rol.status.name === "deleted" ? "Eliminado" : "Activo"}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -164,17 +184,16 @@ export default function RoleTable() {
                             fields={editFields}
                             data={{
                               ...rol,
-                              // Convertir el valor booleano de isDeleted a cadena de texto
-                              isDeleted: rol.status?.isDeleted
-                                ? "true"
-                                : "false",
+                              isDeleted:
+                                rol.status.name === "deleted"
+                                  ? "true"
+                                  : "false",
                             }}
                             isOpen={isEditModalOpen}
                             setIsOpen={setIsEditModalOpen}
                             onSubmit={(updatedData) => {
                               const cleanedData = {
                                 ...updatedData,
-                                // Convertir el valor de isDeleted a booleano al recibir el dato
                                 isDeleted: updatedData.isDeleted === "true",
                               };
                               console.log("Datos actualizados:", cleanedData);
@@ -186,8 +205,12 @@ export default function RoleTable() {
                           variant="ghost"
                           size="icon"
                           aria-label="Eliminar"
-                          onClick={() => {
-                            console.log("Eliminando rol", rol.id);
+                          onClick={async () => {
+                            if (
+                              confirm("¿Estás seguro de eliminar este rol?")
+                            ) {
+                              await handelDeleteRole(rol.id);
+                            }
                           }}
                         >
                           <Trash2 className="h-4 w-4" />
