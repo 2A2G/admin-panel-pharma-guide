@@ -164,12 +164,14 @@ export default function RoleTable() {
               />
             </div>
           </div>
-          <Button variant="default">Agregar Rol</Button>{" "}
-          {/* New button added */}
         </div>
         <div className="flex flex-wrap gap-6">
           {/* Tabla de Roles */}
           <Card className="flex-1 min-w-[350px]">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">Roles</h2>
+              <Button>Agregar Rol</Button>
+            </div>
             <div className="overflow-auto">
               <Table>
                 <TableHeader>
@@ -266,6 +268,10 @@ export default function RoleTable() {
 
           {/* Tabla de Estados */}
           <Card className="flex-1 min-w-[350px]">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">Estados</h2>
+              <Button>Agregar Estado</Button>
+            </div>
             <div className="overflow-auto">
               <Table>
                 <TableHeader>
@@ -279,21 +285,7 @@ export default function RoleTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* {statuses.map((estado) => (
-<TableRow key={estado.id}>
-<TableCell className="font-medium">{estado.id}</TableCell>
-<TableCell>{estado.name}</TableCell>
-<TableCell>
-<span
-className={`px-2 py-1 rounded text-white ${
-  estado.isDeleted ? "bg-gray-500" : "bg-green-500"
-}`}
->
-{estado.isDeleted ? "Inactivo" : "Activo"}
-</span>
-</TableCell>
-</TableRow>
-))} */}
+                  {/* Aquí puedes mapear los estados si tienes los datos */}
                 </TableBody>
               </Table>
             </div>
