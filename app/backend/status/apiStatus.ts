@@ -68,4 +68,5 @@ export class statusService {
       throw new Error(error?.message || "Error al obtener los status");
     }
   }
+
 }

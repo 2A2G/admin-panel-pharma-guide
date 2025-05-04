@@ -16,6 +16,7 @@ import { roleService } from "@/app/backend/roles/apiRole";
 import { Input } from "@/components/ui/input";
 import EditModal from "@/components/ui/editModal";
 import NotificationModal from "@/components/ui/notificationModal";
+import { statusService } from "@/app/backend/status/apiStatus";
 
 const editFields = [
   {
@@ -48,6 +49,14 @@ interface Role {
   };
 }
 
+interface Status {
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+}
+
 interface updateRole {
   idRole: number;
   idStatus: number;
@@ -59,7 +68,9 @@ interface CreateRole {
 
 export default function RoleTable() {
   const [roles, setRoles] = useState<Role[]>([]);
+  const [status, setStatus] = useState<Status[]>([]);
   const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
+  const [statusToEdit, setStatusToEdit] = useState<Status | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -85,8 +96,29 @@ export default function RoleTable() {
     }
   };
 
+  const feachStatus = async () => {
+    const status = new statusService();
+    setLoading(true);
+    try {
+      const response = await status.getStatus();
+
+      if (Array.isArray(response)) {
+        setStatus(response);
+      } else if (response.data && Array.isArray(response.data)) {
+        setStatus(response.data);
+      } else {
+        console.error("Formato de respuesta no esperado:", response);
+      }
+    } catch (error) {
+      console.error("Error al obtener roles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchRoles();
+    feachStatus();
   }, []);
 
   const handelDeleteRole = async (id: number) => {
@@ -159,6 +191,8 @@ export default function RoleTable() {
       setLoading(false);
     }
   };
+
+  const handelDeleteStatus = async (id: number) => {};
 
   if (loading) {
     return (
@@ -327,12 +361,82 @@ export default function RoleTable() {
                     <TableHead className="min-w-[150px]">
                       Nombre del Estado
                     </TableHead>
+                    <TableHead>Fecha de registro </TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Activo</TableHead>
+                    <TableHead>Acción</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* Aquí puedes mapear los estados si tienes los datos */}
+                  {status.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.id}</TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>
+                        {new Date(item.createdAt).toLocaleDateString("es-ES")}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded text-white ${
+                            item.isDeleted === true
+                              ? "bg-red-500"
+                              : "bg-green-500"
+                          }`}
+                        >
+                          {item.isDeleted === true ? "Eliminado" : "Activo"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setStatusToEdit(item)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Editar</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Eliminar"
+                            onClick={async () => {
+                              if (
+                                confirm(
+                                  "¿Estás seguro de eliminar este Estado?"
+                                )
+                              ) {
+                                await handelDeleteStatus(item.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Eliminar</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+
+                  {statusToEdit && (
+                    <EditModal
+                      title="Editar Estado"
+                      description="Modifica los datos del estado."
+                      fields={editFields}
+                      data={{
+                        ...statusToEdit,
+                        isDeleted:
+                          statusToEdit.isDeleted === true ? "true" : "false",
+                      }}
+                      isOpen={!!statusToEdit}
+                      setIsOpen={(isOpen) => {
+                        if (!isOpen) setStatusToEdit(null);
+                      }}
+                      onSubmit={(updatedData) => {
+                        const idStatus =
+                          updatedData.isDeleted === "true" ? 2 : 1;
+                      }}
+                    />
+                  )}
                 </TableBody>
               </Table>
             </div>
