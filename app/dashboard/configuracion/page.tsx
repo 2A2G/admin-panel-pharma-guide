@@ -15,7 +15,6 @@ import LoadingCircles from "@/components/ui/loading";
 import { roleService } from "@/app/backend/roles/apiRole";
 import { Input } from "@/components/ui/input";
 import EditModal from "@/components/ui/editModal";
-import { toast } from "sonner";
 import NotificationModal from "@/components/ui/notificationModal";
 
 const editFields = [
@@ -60,8 +59,8 @@ interface CreateRole {
 
 export default function RoleTable() {
   const [roles, setRoles] = useState<Role[]>([]);
+  const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -122,7 +121,7 @@ export default function RoleTable() {
         setModalMessage("Rol actualizado correctamente");
         setModalOpen(true);
         await fetchRoles();
-        setIsEditModalOpen(false);
+        setRoleToEdit(null);
       } else {
         setModalMessage("Error al actualizar el rol");
         setModalOpen(true);
@@ -195,7 +194,6 @@ export default function RoleTable() {
           </div>
         </div>
         <div className="flex flex-wrap gap-6">
-          {/* Tabla de Roles */}
           <Card className="flex-1 min-w-[350px]">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Roles</h2>
@@ -260,35 +258,11 @@ export default function RoleTable() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setIsEditModalOpen(true)}
+                            onClick={() => setRoleToEdit(rol)}
                           >
                             <Pencil className="h-4 w-4" />
                             <span className="sr-only">Editar</span>
                           </Button>
-                          {isEditModalOpen && (
-                            <EditModal
-                              title="Editar Rol"
-                              description="Modifica los datos del rol."
-                              fields={editFields}
-                              data={{
-                                ...rol,
-                                isDeleted:
-                                  rol.status.name === "deleted"
-                                    ? "true"
-                                    : "false",
-                              }}
-                              isOpen={isEditModalOpen}
-                              setIsOpen={setIsEditModalOpen}
-                              onSubmit={(updatedData) => {
-                                const idStatus =
-                                  updatedData.isDeleted === "true" ? 2 : 1;
-                                handelUpdateRole({
-                                  idRole: rol.id,
-                                  idStatus,
-                                });
-                              }}
-                            />
-                          )}
                           <Button
                             variant="ghost"
                             size="icon"
@@ -309,6 +283,32 @@ export default function RoleTable() {
                     </TableRow>
                   ))}
                 </TableBody>
+
+                {/* Este modal ya no está dentro del map ni de TableRow */}
+                {roleToEdit && (
+                  <EditModal
+                    title="Editar Rol"
+                    description="Modifica los datos del rol."
+                    fields={editFields}
+                    data={{
+                      ...roleToEdit,
+                      isDeleted:
+                        roleToEdit.status.name === "deleted" ? "true" : "false",
+                    }}
+                    isOpen={!!roleToEdit}
+                    setIsOpen={(isOpen) => {
+                      if (!isOpen) setRoleToEdit(null);
+                    }}
+                    onSubmit={(updatedData) => {
+                      const idStatus = updatedData.isDeleted === "true" ? 2 : 1;
+                      handelUpdateRole({
+                        idRole: roleToEdit.id,
+                        idStatus,
+                      });
+                      setRoleToEdit(null);
+                    }}
+                  />
+                )}
               </Table>
             </div>
           </Card>
