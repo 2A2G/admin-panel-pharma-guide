@@ -65,6 +65,9 @@ interface updateRole {
 interface CreateRole {
   name: string;
 }
+interface CreateStatus {
+  name: string;
+}
 
 export default function RoleTable() {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -192,6 +195,29 @@ export default function RoleTable() {
     }
   };
 
+  const handelCreateStatus = async ({ name }: CreateStatus) => {
+    const newStatu = new statusService();
+    setLoading(true);
+    try {
+      const response = await newStatu.createStatus(name);
+      if (response) {
+        setModalMessage("Estado creado correctamente");
+        setModalOpen(true);
+        await feachStatus();
+        setIsAddModalOpen(false);
+      } else {
+        setModalMessage("Error al crear el estado");
+        setModalOpen(true);
+        console.error("Error al crear el estado:", response);
+      }
+    } catch (error) {
+      setModalMessage("Error inesperado al crear el estado");
+      setModalOpen(true);
+      console.error("Error al crear el estado:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const handelDeleteStatus = async (id: number) => {};
 
   if (loading) {
@@ -351,7 +377,25 @@ export default function RoleTable() {
           <Card className="flex-1 min-w-[350px]">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Estados</h2>
-              <Button>Agregar Estado</Button>
+              <Button onClick={() => setIsAddModalOpen(true)}>
+                Agregar Estado
+              </Button>
+
+              {isAddModalOpen && (
+                <EditModal
+                  title="Agregar Estado"
+                  description="Ingresa el nombre del nuevo estado."
+                  fields={[
+                    { name: "name", label: "Nombre del estado", type: "text" },
+                  ]}
+                  data={{ name: "" }}
+                  isOpen={isAddModalOpen}
+                  setIsOpen={setIsAddModalOpen}
+                  onSubmit={(formData: Record<string, any>) =>
+                    handelCreateStatus(formData as CreateStatus)
+                  }
+                />
+              )}
             </div>
             <div className="overflow-auto">
               <Table>
