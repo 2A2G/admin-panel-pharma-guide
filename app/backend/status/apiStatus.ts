@@ -7,6 +7,11 @@ export interface Status {
   idStatus: number;
   name: string;
 }
+interface updateStatus {
+  idRole: number;
+  name: string;
+  isDeleted: boolean;
+}
 
 const urlBas = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
 const urlBase = `${urlBas}/api/pharma-guide/setting`;
@@ -83,8 +88,6 @@ export class statusService {
         data: { id: idStatus },
       });
 
-      console.log(response);
-
       if (response.status === 200) {
         return response.data;
       } else {
@@ -92,6 +95,41 @@ export class statusService {
       }
     } catch (error: any) {
       throw new Error(error?.message || "Error al eliminar el estado");
+    }
+  }
+
+  async updateStaus(updateStatus: updateStatus) {
+    try {
+      const { idRole, isDeleted } = updateStatus;
+
+      if (!idRole) {
+        throw new Error("El id del estado no está presente");
+      }
+
+      const token = await statusService.getToken();
+
+      const response = await axios.put(
+        `${urlBase}/status`,
+        {
+          id: idRole,
+          isDeleted: isDeleted,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error(
+          "Error en el servidor, no se pudo actualizar el estado"
+        );
+      }
+    } catch (error: any) {
+      throw new Error(error?.message || "Error al actualizar el estado");
     }
   }
 }

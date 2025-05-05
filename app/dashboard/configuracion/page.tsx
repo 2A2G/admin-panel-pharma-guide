@@ -61,6 +61,11 @@ interface updateRole {
   idRole: number;
   idStatus: number;
 }
+interface updateStatus {
+  idRole: number;
+  name: string;
+  isDeleted: boolean;
+}
 
 interface CreateRole {
   name: string;
@@ -238,6 +243,30 @@ export default function RoleTable() {
       setModalMessage("Errro inesperado al eliminar el estado");
       setModalOpen(true);
       console.log("Error al eliminar el rol:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handelUpdateStatus = async (updateData: updateStatus) => {
+    const oldStatus = new statusService();
+    setLoading(true);
+    try {
+      const response = await oldStatus.updateStaus(updateData);
+      if (response) {
+        setModalMessage("Estado actualizado correctamente");
+        setModalOpen(true);
+        await feachStatus();
+        setStatusToEdit(null);
+      } else {
+        setModalMessage("Error al actualizar el estado");
+        setModalOpen(true);
+        console.error("Error al actualizar el estado:", response);
+      }
+    } catch (error) {
+      setModalMessage("Error inesperado al actualizar el estado");
+      setModalOpen(true);
+      console.error("Error al actualizar el estado:", error);
     } finally {
       setLoading(false);
     }
@@ -515,9 +544,13 @@ export default function RoleTable() {
                         if (!isOpen) setStatusToEdit(null);
                       }}
                       onSubmit={(updatedData) => {
-                        const idStatus =
-                          updatedData.isDeleted === "true" ? 2 : 1;
-                        // Aquí puedes usar idStatus según tu lógica
+                        const isDeleted = updatedData.isDeleted === "true";
+                        handelUpdateStatus({
+                          idRole: statusToEdit.id,
+                          isDeleted: isDeleted,
+                          name: updatedData.name,
+                        });
+                        setRoleToEdit(null);
                       }}
                     />
                   )}
