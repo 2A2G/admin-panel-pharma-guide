@@ -69,4 +69,29 @@ export class statusService {
     }
   }
 
+  async deleteStaus(idStatus: number) {
+    try {
+      if (!idStatus || idStatus === null) {
+        throw new Error("El id del estado no esta presente");
+      }
+      const token = await statusService.getToken();
+
+      const response = await axios.delete(`${urlBase + "/status"}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: { id: idStatus },
+      });
+
+      console.log(response);
+
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Errr en el serrvidor no se pudo eliminar el estado");
+      }
+    } catch (error: any) {
+      throw new Error(error?.message || "Error al eliminar el estado");
+    }
+  }
 }

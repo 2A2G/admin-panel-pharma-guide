@@ -124,24 +124,25 @@ export default function RoleTable() {
     feachStatus();
   }, []);
 
-  const handelDeleteRole = async (id: number) => {
-    const role = new roleService();
+  const handelCreateRole = async ({ name }: CreateRole) => {
+    const newRol = new roleService();
     setLoading(true);
     try {
-      const response = await role.deleteRole(id);
+      const response = await newRol.createRole(name);
       if (response) {
-        setModalMessage("Rol eliminado correctamente");
+        setModalMessage("Rol creado correctamente");
         setModalOpen(true);
         await fetchRoles();
+        setIsAddModalOpen(false);
       } else {
-        setModalMessage("Error al eliminar el rol");
+        setModalMessage("Error al crear el rol");
         setModalOpen(true);
-        console.error("Error al eliminar el rol:", response);
+        console.error("Error al crear el rol:", response);
       }
     } catch (error) {
-      setModalMessage("Error inesperado al eliminar el rol");
+      setModalMessage("Error inesperado al crear el rol");
       setModalOpen(true);
-      console.error("Error al eliminar el rol:", error);
+      console.error("Error al crear el rol:", error);
     } finally {
       setLoading(false);
     }
@@ -171,25 +172,24 @@ export default function RoleTable() {
     }
   };
 
-  const handelCreateRole = async ({ name }: CreateRole) => {
-    const newRol = new roleService();
+  const handelDeleteRole = async (id: number) => {
+    const role = new roleService();
     setLoading(true);
     try {
-      const response = await newRol.createRole(name);
+      const response = await role.deleteRole(id);
       if (response) {
-        setModalMessage("Rol creado correctamente");
+        setModalMessage("Rol eliminado correctamente");
         setModalOpen(true);
         await fetchRoles();
-        setIsAddModalOpen(false);
       } else {
-        setModalMessage("Error al crear el rol");
+        setModalMessage("Error al eliminar el rol");
         setModalOpen(true);
-        console.error("Error al crear el rol:", response);
+        console.error("Error al eliminar el rol:", response);
       }
     } catch (error) {
-      setModalMessage("Error inesperado al crear el rol");
+      setModalMessage("Error inesperado al eliminar el rol");
       setModalOpen(true);
-      console.error("Error al crear el rol:", error);
+      console.error("Error al eliminar el rol:", error);
     } finally {
       setLoading(false);
     }
@@ -218,7 +218,30 @@ export default function RoleTable() {
       setLoading(false);
     }
   };
-  const handelDeleteStatus = async (id: number) => {};
+
+  const handelDeleteStatus = async (id: number) => {
+    const status = new statusService();
+    setLoading(true);
+    try {
+      const response = await status.deleteStaus(id);
+      if (response) {
+        setModalMessage("Estado eliminado correctamente");
+        setModalOpen(true);
+        setLoading(false);
+        await feachStatus();
+      } else {
+        setModalMessage("Error al eliinar el estado");
+        setModalOpen(true);
+        console.error("Error al eliminar el estado:", response);
+      }
+    } catch (error) {
+      setModalMessage("Errro inesperado al eliminar el estado");
+      setModalOpen(true);
+      console.log("Error al eliminar el rol:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -293,58 +316,71 @@ export default function RoleTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {roles.map((rol) => (
-                    <TableRow key={rol.id}>
-                      <TableCell className="font-medium">{rol.id}</TableCell>
-                      <TableCell>{rol.name}</TableCell>
-                      <TableCell>
-                        {new Date(rol.createdAt).toLocaleDateString("es-ES")}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded text-white ${
-                            rol.status.name === "deleted"
-                              ? "bg-red-500"
-                              : "bg-green-500"
-                          }`}
-                        >
-                          {rol.status.name === "deleted"
-                            ? "Eliminado"
-                            : "Activo"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setRoleToEdit(rol)}
+                  {roles
+                    .sort((a, b) => {
+                      if (
+                        a.status.name === "deleted" &&
+                        b.status.name !== "deleted"
+                      )
+                        return 1;
+                      if (
+                        a.status.name !== "deleted" &&
+                        b.status.name === "deleted"
+                      )
+                        return -1;
+                      return 0;
+                    })
+                    .map((rol) => (
+                      <TableRow key={rol.id}>
+                        <TableCell className="font-medium">{rol.id}</TableCell>
+                        <TableCell>{rol.name}</TableCell>
+                        <TableCell>
+                          {new Date(rol.createdAt).toLocaleDateString("es-ES")}
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`px-2 py-1 rounded text-white ${
+                              rol.status.name === "deleted"
+                                ? "bg-red-500"
+                                : "bg-green-500"
+                            }`}
                           >
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Editar</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label="Eliminar"
-                            onClick={async () => {
-                              if (
-                                confirm("¿Estás seguro de eliminar este rol?")
-                              ) {
-                                await handelDeleteRole(rol.id);
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Eliminar</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                            {rol.status.name === "deleted"
+                              ? "Eliminado"
+                              : "Activo"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setRoleToEdit(rol)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">Editar</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label="Eliminar"
+                              onClick={async () => {
+                                if (
+                                  confirm("¿Estás seguro de eliminar este rol?")
+                                ) {
+                                  await handelDeleteRole(rol.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Eliminar</span>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
 
-                {/* Este modal ya no está dentro del map ni de TableRow */}
                 {roleToEdit && (
                   <EditModal
                     title="Editar Rol"
@@ -411,55 +447,59 @@ export default function RoleTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {status.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.id}</TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>
-                        {new Date(item.createdAt).toLocaleDateString("es-ES")}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded text-white ${
-                            item.isDeleted === true
-                              ? "bg-red-500"
-                              : "bg-green-500"
-                          }`}
-                        >
-                          {item.isDeleted === true ? "Eliminado" : "Activo"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setStatusToEdit(item)}
+                  {status
+                    .sort((a, b) => {
+                      if (a.isDeleted && !b.isDeleted) return 1;
+                      if (!a.isDeleted && b.isDeleted) return -1;
+                      return 0;
+                    })
+                    .map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{item.id}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>
+                          {new Date(item.createdAt).toLocaleDateString("es-ES")}
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`px-2 py-1 rounded text-white ${
+                              item.isDeleted ? "bg-red-500" : "bg-green-500"
+                            }`}
                           >
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Editar</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label="Eliminar"
-                            onClick={async () => {
-                              if (
-                                confirm(
-                                  "¿Estás seguro de eliminar este Estado?"
-                                )
-                              ) {
-                                await handelDeleteStatus(item.id);
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Eliminar</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                            {item.isDeleted ? "Eliminado" : "Activo"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setStatusToEdit(item)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">Editar</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label="Eliminar"
+                              onClick={async () => {
+                                if (
+                                  confirm(
+                                    "¿Estás seguro de eliminar este Estado?"
+                                  )
+                                ) {
+                                  await handelDeleteStatus(item.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Eliminar</span>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
 
                   {statusToEdit && (
                     <EditModal
@@ -468,8 +508,7 @@ export default function RoleTable() {
                       fields={editFields}
                       data={{
                         ...statusToEdit,
-                        isDeleted:
-                          statusToEdit.isDeleted === true ? "true" : "false",
+                        isDeleted: statusToEdit.isDeleted ? "true" : "false",
                       }}
                       isOpen={!!statusToEdit}
                       setIsOpen={(isOpen) => {
@@ -478,6 +517,7 @@ export default function RoleTable() {
                       onSubmit={(updatedData) => {
                         const idStatus =
                           updatedData.isDeleted === "true" ? 2 : 1;
+                        // Aquí puedes usar idStatus según tu lógica
                       }}
                     />
                   )}
