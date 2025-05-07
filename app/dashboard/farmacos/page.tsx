@@ -1,24 +1,52 @@
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Download, Edit, Plus, Search, Trash2, Upload } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Edit,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function MedicamentosPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Medicamentos</h1>
-        <p className="text-muted-foreground">Gestiona los medicamentos disponibles en la aplicación.</p>
+        <p className="text-muted-foreground">
+          Gestiona los medicamentos disponibles en la aplicación.
+        </p>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Buscar medicamentos..." className="pl-8 w-full sm:w-[300px]" />
+            <Input
+              type="search"
+              placeholder="Buscar medicamentos..."
+              className="pl-8 w-full sm:w-[300px]"
+            />
           </div>
           <Select defaultValue="all">
             <SelectTrigger className="w-full sm:w-[180px]">
@@ -29,17 +57,27 @@ export default function MedicamentosPage() {
               <SelectItem value="analgesicos">Analgésicos</SelectItem>
               <SelectItem value="antibioticos">Antibióticos</SelectItem>
               <SelectItem value="antialergicos">Antialérgicos</SelectItem>
-              <SelectItem value="antiinflamatorios">Antiinflamatorios</SelectItem>
+              <SelectItem value="antiinflamatorios">
+                Antiinflamatorios
+              </SelectItem>
               <SelectItem value="antiacidos">Antiácidos</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
             <Upload className="h-4 w-4" />
             <span>Importar</span>
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
             <Download className="h-4 w-4" />
             <span>Exportar</span>
           </Button>
@@ -57,7 +95,9 @@ export default function MedicamentosPage() {
               <TableRow>
                 <TableHead className="w-[50px]">ID</TableHead>
                 <TableHead className="min-w-[150px]">Nombre</TableHead>
-                <TableHead className="min-w-[150px]">Principio Activo</TableHead>
+                <TableHead className="min-w-[150px]">
+                  Principio Activo
+                </TableHead>
                 <TableHead>Categoría</TableHead>
                 <TableHead>Laboratorio</TableHead>
                 <TableHead>Estado</TableHead>
@@ -124,13 +164,23 @@ export default function MedicamentosPage() {
                 },
               ].map((medicamento) => (
                 <TableRow key={medicamento.id}>
-                  <TableCell className="font-medium">{medicamento.id}</TableCell>
-                  <TableCell className="min-w-[150px]">{medicamento.nombre}</TableCell>
+                  <TableCell className="font-medium">
+                    {medicamento.id}
+                  </TableCell>
+                  <TableCell className="min-w-[150px]">
+                    {medicamento.nombre}
+                  </TableCell>
                   <TableCell>{medicamento.principioActivo}</TableCell>
                   <TableCell>{medicamento.categoria}</TableCell>
                   <TableCell>{medicamento.laboratorio}</TableCell>
                   <TableCell>
-                    <Badge variant={medicamento.estado === "Activo" ? "success" : "secondary"}>
+                    <Badge
+                      variant={
+                        medicamento.estado === "Activo"
+                          ? "success"
+                          : "secondary"
+                      }
+                    >
                       {medicamento.estado}
                     </Badge>
                   </TableCell>
@@ -177,5 +227,5 @@ export default function MedicamentosPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }
