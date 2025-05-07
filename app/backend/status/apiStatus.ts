@@ -100,7 +100,7 @@ export class statusService {
 
   async updateStaus(updateStatus: updateStatus) {
     try {
-      const { idRole, isDeleted } = updateStatus;
+      const { idRole, name, isDeleted } = updateStatus;
 
       if (!idRole) {
         throw new Error("El id del estado no está presente");
@@ -112,6 +112,7 @@ export class statusService {
         `${urlBase}/status`,
         {
           id: idRole,
+          name: name,
           isDeleted: isDeleted,
         },
         {
