@@ -33,6 +33,8 @@ import { useEffect } from "react";
 import { UserService } from "@/app/backend/users/apiUser";
 import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
+import EditModal from "@/components/ui/editModal";
+import { roleService } from "@/app/backend/roles/apiRole";
 
 export default function UsuariosPage() {
   interface Usuario {
@@ -43,26 +45,78 @@ export default function UsuariosPage() {
     createdAt: string;
     isDeleted: boolean;
   }
+  interface Role {
+    id: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    status: {
+      id: number;
+      name: string;
+      isDeleted: boolean;
+      createdAt: string;
+      updatedAt: string;
+    };
+  }
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [roles, setRoles] = useState<Role[]>([]);
 
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const usersPerPage = 10;
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const userService = new UserService();
-      try {
-        const user = await userService.getUser();
-        setUsuarios(user.data);
-      } catch (error) {
-        console.error("Error al obtener el usuario:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
-  }, []);
+  const fetchUsers = async () => {
+    const userService = new UserService();
+    try {
+      const user = await userService.getUser();
+      setUsuarios(user.data);
+    } catch (error) {
+      console.error("Error al obtener el usuario:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchRoles = async () => {
+    const role = new roleService();
+    setLoading(true);
+    try {
+      const response = await role.getRole();
+
+      if (Array.isArray(response)) {
+        setRoles(response);
+      } else if (response.data && Array.isArray(response.data)) {
+        setRoles(response.data);
+      } else {
+        console.error("Formato de respuesta no esperado:", response);
+      }
+    } catch (error) {
+      console.error("Error al obtener roles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateUser = async ({ Usuario }: Usuario) => {
+    const newUser = new UserService();
+    setLoading(true);
+    try {
+    } catch (error) {
+      setModalMessage("Error inespetado al crear el usuario");
+      setIsEditModalOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchRoles();
+  }, []);
   const totalUsers = usuarios.length;
   const totalPages = Math.ceil(totalUsers / usersPerPage);
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,10 +163,44 @@ export default function UsuariosPage() {
           </Select>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Button size="sm" className="flex items-center gap-2">
+          <Button
+            onClick={() => setIsAddModalOpen(true)}
+            size="sm"
+            className="flex items-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             <span>Añadir Usuario</span>
           </Button>
+
+          {isAddModalOpen && (
+            <EditModal
+              title="Añadir nuevo Usuario"
+              description="Ingresa los datos del usuario."
+              fields={[
+                {
+                  name: "name",
+                  label: "Nombre completo del Usuario",
+                  type: "text",
+                },
+                { name: "email", label: "Correo Electronico", type: "email" },
+                {
+                  name: "role_id",
+                  label: "Rol asignado",
+                  type: "select",
+                  options: roles.map((role) => ({
+                    label: role.name,
+                    value: role.id.toString(),
+                  })),
+                },
+              ]}
+              data={{ name: "" }}
+              isOpen={isAddModalOpen}
+              setIsOpen={setIsAddModalOpen}
+              onSubmit={(formData: Record<string, any>) =>
+                handleCreateUser(formData as Usuario)
+              }
+            />
+          )}
         </div>
       </div>
 
