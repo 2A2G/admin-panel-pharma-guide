@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import EditModal from "@/components/ui/editModal";
 import NotificationModal from "@/components/ui/notificationModal";
 import { statusService } from "@/app/backend/status/apiStatus";
+import DeleteModal from "@/components/ui/deleteModal";
 
 const editFields = [
   {
@@ -73,6 +74,10 @@ interface CreateRole {
 interface CreateStatus {
   name: string;
 }
+interface ItemToDelete {
+  id: number;
+  title: string;
+}
 
 export default function RoleTable() {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -83,6 +88,8 @@ export default function RoleTable() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<ItemToDelete | null>(null);
 
   const fetchRoles = async () => {
     const role = new roleService();
@@ -224,7 +231,12 @@ export default function RoleTable() {
     }
   };
 
-  const handelDeleteStatus = async (id: number) => {
+  const handleDelete = (itemId: number, itemName: string) => {
+    setItemToDelete({ id: itemId, title: itemName });
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async (id: number) => {
     const status = new statusService();
     setLoading(true);
     try {
@@ -513,12 +525,8 @@ export default function RoleTable() {
                               size="icon"
                               aria-label="Eliminar"
                               onClick={async () => {
-                                if (
-                                  confirm(
-                                    "¿Estás seguro de eliminar este Estado?"
-                                  )
-                                ) {
-                                  await handelDeleteStatus(item.id);
+                                {
+                                  await handleDelete(item.id, item.name);
                                 }
                               }}
                             >
@@ -566,6 +574,14 @@ export default function RoleTable() {
         message={modalMessage}
         title="Notificación"
         variant="info"
+      />
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() =>
+          itemToDelete?.id !== undefined && confirmDelete(itemToDelete.id)
+        }
+        itemTitle={itemToDelete?.title || ""}
       />
     </>
   );
