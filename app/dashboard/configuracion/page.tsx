@@ -77,6 +77,7 @@ interface CreateStatus {
 interface ItemToDelete {
   id: number;
   title: string;
+  caso: string;
 }
 
 export default function RoleTable() {
@@ -135,6 +136,19 @@ export default function RoleTable() {
     fetchRoles();
     feachStatus();
   }, []);
+
+  const handleDelete = (itemId: number, itemName: string, itemCaso: string) => {
+    setItemToDelete({ id: itemId, title: itemName, caso: itemCaso });
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async (id: number, caso: string) => {
+    if (caso === "role") {
+      await handelDeleteRole(id);
+    } else {
+      await handelDeleteStatus(id);
+    }
+  };
 
   const handelCreateRole = async ({ name }: CreateRole) => {
     const newRol = new roleService();
@@ -231,12 +245,7 @@ export default function RoleTable() {
     }
   };
 
-  const handleDelete = (itemId: number, itemName: string) => {
-    setItemToDelete({ id: itemId, title: itemName });
-    setIsDeleteModalOpen(true);
-  };
-
-  const confirmDelete = async (id: number) => {
+  const handelDeleteStatus = async (id: number) => {
     const status = new statusService();
     setLoading(true);
     try {
@@ -406,10 +415,8 @@ export default function RoleTable() {
                               size="icon"
                               aria-label="Eliminar"
                               onClick={async () => {
-                                if (
-                                  confirm("¿Estás seguro de eliminar este rol?")
-                                ) {
-                                  await handelDeleteRole(rol.id);
+                                {
+                                  await handleDelete(rol.id, rol.name, "role");
                                 }
                               }}
                             >
@@ -526,7 +533,11 @@ export default function RoleTable() {
                               aria-label="Eliminar"
                               onClick={async () => {
                                 {
-                                  await handleDelete(item.id, item.name);
+                                  await handleDelete(
+                                    item.id,
+                                    item.name,
+                                    "estado"
+                                  );
                                 }
                               }}
                             >
@@ -579,7 +590,8 @@ export default function RoleTable() {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={() =>
-          itemToDelete?.id !== undefined && confirmDelete(itemToDelete.id)
+          itemToDelete?.id !== undefined &&
+          confirmDelete(itemToDelete.id, itemToDelete?.caso)
         }
         itemTitle={itemToDelete?.title || ""}
       />
