@@ -300,9 +300,9 @@ export default function UsuariosPage() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={usuario.isDeleted ? "secondary" : "success"}
+                        variant={usuario.isDeleted ? "destructive" : "success"}
                       >
-                        {usuario.isDeleted ? "Inactivo" : "Activo"}
+                        {usuario.isDeleted ? "Eliminado" : "Activo"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
