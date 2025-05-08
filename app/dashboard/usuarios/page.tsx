@@ -45,6 +45,12 @@ export default function UsuariosPage() {
     createdAt: string;
     isDeleted: boolean;
   }
+
+  interface creareUser {
+    full_name: string;
+    email: string;
+    roleId: number;
+  }
   interface Role {
     id: number;
     name: string;
@@ -59,7 +65,7 @@ export default function UsuariosPage() {
     };
   }
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -101,22 +107,41 @@ export default function UsuariosPage() {
     }
   };
 
-  const handleCreateUser = async ({ Usuario }: Usuario) => {
+  useEffect(() => {
+    fetchUsers();
+    fetchRoles();
+  }, []);
+
+  const handleCreateUser = async ({ usuario }: { usuario: creareUser }) => {
     const newUser = new UserService();
     setLoading(true);
+
     try {
+      const response = await newUser.createUser(
+        usuario.full_name,
+        usuario.email,
+        usuario.roleId
+      );
+      if (response) {
+        setModalMessage("Usuario creado exitosamente");
+        setModalOpen(true);
+        await fetchUsers();
+        setIsAddModalOpen(false);
+      } else {
+        setModalMessage(
+          "Hubo un error al crear el usuario. Inténtelo nuevamente."
+        );
+        setModalOpen(true);
+      }
     } catch (error) {
-      setModalMessage("Error inespetado al crear el usuario");
-      setIsEditModalOpen(true);
+      setModalMessage("Error del servidor al crear el usuario");
+      setModalOpen(true);
+      console.error("Error al crear el usuario:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-    fetchRoles();
-  }, []);
   const totalUsers = usuarios.length;
   const totalPages = Math.ceil(totalUsers / usersPerPage);
   const [currentPage, setCurrentPage] = useState(1);
@@ -131,6 +156,7 @@ export default function UsuariosPage() {
       </div>
     );
   }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -178,17 +204,17 @@ export default function UsuariosPage() {
               description="Ingresa los datos del usuario."
               fields={[
                 {
-                  name: "name",
+                  name: "full_name",
                   label: "Nombre completo del Usuario",
                   type: "text",
                 },
                 { name: "email", label: "Correo Electronico", type: "email" },
                 {
-                  name: "role_id",
+                  name: "roleId",
                   label: "Rol asignado",
                   type: "select",
                   options: roles.map((role) => ({
-                    label: role.name,
+                    label: role?.name ?? "",
                     value: role.id.toString(),
                   })),
                 },
@@ -197,7 +223,7 @@ export default function UsuariosPage() {
               isOpen={isAddModalOpen}
               setIsOpen={setIsAddModalOpen}
               onSubmit={(formData: Record<string, any>) =>
-                handleCreateUser(formData as Usuario)
+                handleCreateUser({ usuario: formData as creareUser })
               }
             />
           )}
@@ -226,7 +252,8 @@ export default function UsuariosPage() {
                     {usuario.full_name}
                   </TableCell>
                   <TableCell>{usuario.email}</TableCell>
-                  <TableCell>{usuario.role.name}</TableCell>
+                  <TableCell>{usuario.role?.name ?? ""}</TableCell>
+
                   <TableCell>
                     {new Date(usuario.createdAt).toLocaleDateString("es-ES")}
                   </TableCell>
