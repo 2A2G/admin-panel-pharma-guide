@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import isotipo from "../img/isotipo_.png";
 import { AccesService } from "@/app/backend/access/acces";
+import LoadingCircles from "@/components/ui/loading";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,8 +27,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     setIsLoading(true);
+    e.preventDefault();
     setError("");
 
     const formData = new FormData(e.currentTarget);
@@ -46,23 +47,21 @@ export default function LoginPage() {
         setError("Credenciales inválidas. Intente nuevamente.");
       }
     } catch (err: any) {
-      setError(err.message || "Error al iniciar sesión. Intente nuevamente.");
+      setError("Error al iniciar sesión. Intente nuevamente.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      const accesService = new AccesService();
-      await accesService.logout();
-      document.cookie = "auth_token=; path=/; max-age=0";
-      router.push("/login");
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
-  };
-
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-white">
+        <div className="flex flex-col items-center">
+          <LoadingCircles />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
       <Card className="w-full max-w-md shadow-lg">

@@ -15,7 +15,6 @@ import {
   LogOut,
   Menu,
   Bot,
-  Syringe,
   FlaskConical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,7 @@ import isotipo from "../app/img/isotipo_.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AccesService } from "@/app/backend/access/acces";
+import LoadingCircles from "./ui/loading";
 
 interface NavItem {
   title: string;
@@ -79,8 +79,10 @@ export function MainNav() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
       const accesService = new AccesService();
       await accesService.logout();
@@ -91,6 +93,15 @@ export function MainNav() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-white">
+        <div className="flex flex-col items-center">
+          <LoadingCircles />
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       {/* Mobile Navigation */}
