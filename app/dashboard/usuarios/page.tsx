@@ -35,6 +35,7 @@ import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
 import EditModal from "@/components/ui/editModal";
 import { roleService } from "@/app/backend/roles/apiRole";
+import NotificationModal from "@/components/ui/notificationModal";
 
 export default function UsuariosPage() {
   interface Usuario {
@@ -65,10 +66,11 @@ export default function UsuariosPage() {
     };
   }
 
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [roles, setRoles] = useState<Role[]>([]);
 
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -158,171 +160,180 @@ export default function UsuariosPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Usuarios</h1>
-        <p className="text-muted-foreground">
-          Gestiona los usuarios registrados en la aplicación.
-        </p>
-      </div>
+    <>
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Usuarios</h1>
+          <p className="text-muted-foreground">
+            Gestiona los usuarios registrados en la aplicación.
+          </p>
+        </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Buscar usuarios..."
-              className="pl-8 w-full sm:w-[300px]"
-            />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Buscar usuarios..."
+                className="pl-8 w-full sm:w-[300px]"
+              />
+            </div>
+            <Select defaultValue="all">
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Filtrar por rol" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los roles</SelectItem>
+                <SelectItem value="admin">Administrador</SelectItem>
+                <SelectItem value="editor">Editor</SelectItem>
+                <SelectItem value="user">Usuario</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filtrar por rol" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los roles</SelectItem>
-              <SelectItem value="admin">Administrador</SelectItem>
-              <SelectItem value="editor">Editor</SelectItem>
-              <SelectItem value="user">Usuario</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Button
+              onClick={() => setIsAddModalOpen(true)}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Añadir Usuario</span>
+            </Button>
+
+            {isAddModalOpen && (
+              <EditModal
+                title="Añadir nuevo Usuario"
+                description="Ingresa los datos del usuario."
+                fields={[
+                  {
+                    name: "full_name",
+                    label: "Nombre completo del Usuario",
+                    type: "text",
+                  },
+                  { name: "email", label: "Correo Electronico", type: "email" },
+                  {
+                    name: "roleId",
+                    label: "Rol asignado",
+                    type: "select",
+                    options: roles.map((role) => ({
+                      label: role?.name ?? "",
+                      value: String(role.id),
+                    })),
+                  },
+                ]}
+                data={{ name: "" }}
+                isOpen={isAddModalOpen}
+                setIsOpen={setIsAddModalOpen}
+                onSubmit={(formData: Record<string, any>) =>
+                  handleCreateUser({ usuario: formData as creareUser })
+                }
+              />
+            )}
+          </div>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Button
-            onClick={() => setIsAddModalOpen(true)}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Añadir Usuario</span>
-          </Button>
 
-          {isAddModalOpen && (
-            <EditModal
-              title="Añadir nuevo Usuario"
-              description="Ingresa los datos del usuario."
-              fields={[
-                {
-                  name: "full_name",
-                  label: "Nombre completo del Usuario",
-                  type: "text",
-                },
-                { name: "email", label: "Correo Electronico", type: "email" },
-                {
-                  name: "roleId",
-                  label: "Rol asignado",
-                  type: "select",
-                  options: roles.map((role) => ({
-                    label: role?.name ?? "",
-                    value: role.id.toString(),
-                  })),
-                },
-              ]}
-              data={{ name: "" }}
-              isOpen={isAddModalOpen}
-              setIsOpen={setIsAddModalOpen}
-              onSubmit={(formData: Record<string, any>) =>
-                handleCreateUser({ usuario: formData as creareUser })
-              }
-            />
-          )}
-        </div>
-      </div>
-
-      <Card>
-        <div className="overflow-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">ID</TableHead>
-                <TableHead className="min-w-[150px]">Nombre</TableHead>
-                <TableHead className="min-w-[150px]">Email</TableHead>
-                <TableHead>Rol</TableHead>
-                <TableHead>Fecha de registro</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentUsers.map((usuario) => (
-                <TableRow key={usuario.id}>
-                  <TableCell className="font-medium">{usuario.id}</TableCell>
-                  <TableCell className="min-w-[150px]">
-                    {usuario.full_name}
-                  </TableCell>
-                  <TableCell>{usuario.email}</TableCell>
-                  <TableCell>{usuario.role?.name ?? ""}</TableCell>
-
-                  <TableCell>
-                    {new Date(usuario.createdAt).toLocaleDateString("es-ES")}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={usuario.isDeleted ? "secondary" : "success"}
-                    >
-                      {usuario.isDeleted ? "Inactivo" : "Activo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Editar</span>
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Eliminar</span>
-                      </Button>
-                    </div>
-                  </TableCell>
+        <Card>
+          <div className="overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">ID</TableHead>
+                  <TableHead className="min-w-[150px]">Nombre</TableHead>
+                  <TableHead className="min-w-[150px]">Email</TableHead>
+                  <TableHead>Rol</TableHead>
+                  <TableHead>Fecha de registro</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex items-center justify-between px-4 py-4 border-t">
-          <div className="text-sm text-muted-foreground">
-            Mostrando <strong>{currentUsers.length}</strong> de{" "}
-            <strong>{totalUsers}</strong> usuarios
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="sr-only">Página anterior</span>
-            </Button>
+              </TableHeader>
+              <TableBody>
+                {currentUsers.map((usuario) => (
+                  <TableRow key={usuario.id}>
+                    <TableCell className="font-medium">{usuario.id}</TableCell>
+                    <TableCell className="min-w-[150px]">
+                      {usuario.full_name}
+                    </TableCell>
+                    <TableCell>{usuario.email}</TableCell>
+                    <TableCell>{usuario.role?.name ?? ""}</TableCell>
 
-            {Array.from({ length: totalPages }).map((_, index) => (
+                    <TableCell>
+                      {new Date(usuario.createdAt).toLocaleDateString("es-ES")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={usuario.isDeleted ? "secondary" : "success"}
+                      >
+                        {usuario.isDeleted ? "Inactivo" : "Activo"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon">
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Eliminar</span>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-between px-4 py-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              Mostrando <strong>{currentUsers.length}</strong> de{" "}
+              <strong>{totalUsers}</strong> usuarios
+            </div>
+            <div className="flex items-center gap-2">
               <Button
-                key={index}
-                variant={currentPage === index + 1 ? "default" : "outline"}
-                size="sm"
-                className="h-8 w-8"
-                onClick={() => setCurrentPage(index + 1)}
+                variant="outline"
+                size="icon"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               >
-                {index + 1}
+                <ChevronLeft className="h-4 w-4" />
+                <span className="sr-only">Página anterior</span>
               </Button>
-            ))}
 
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-            >
-              <ChevronRight className="h-4 w-4" />
-              <span className="sr-only">Página siguiente</span>
-            </Button>
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <Button
+                  key={index}
+                  variant={currentPage === index + 1 ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 w-8"
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </Button>
+              ))}
+
+              <Button
+                variant="outline"
+                size="icon"
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              >
+                <ChevronRight className="h-4 w-4" />
+                <span className="sr-only">Página siguiente</span>
+              </Button>
+            </div>
           </div>
-        </div>
-      </Card>
-    </div>
+        </Card>
+      </div>
+      <NotificationModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMessage}
+        title="Notificación"
+        variant="info"
+      />
+    </>
   );
 }
