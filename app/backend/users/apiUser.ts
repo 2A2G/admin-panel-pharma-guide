@@ -56,4 +56,27 @@ export class UserService {
       throw new Error(error?.message || "Error al obtener el usuario.");
     }
   }
+
+  async deleteUser(idUser: number) {
+    try {
+      const token = await AccessTokenService.getToken();
+
+      const response = await axios.delete(`${urlBase}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          idUser,
+        },
+      });
+
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Error al eliminar el usuario.");
+      }
+    } catch (error: any) {
+      throw new Error(error?.message || "Error al eliminar el usuario.");
+    }
+  }
 }

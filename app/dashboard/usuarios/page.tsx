@@ -29,13 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect } from "react";
+import { SetStateAction, useEffect } from "react";
 import { UserService } from "@/app/backend/users/apiUser";
 import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
 import EditModal from "@/components/ui/editModal";
 import { roleService } from "@/app/backend/roles/apiRole";
 import NotificationModal from "@/components/ui/notificationModal";
+import DeleteModal from "@/components/ui/deleteModal";
 
 export default function UsuariosPage() {
   interface Usuario {
@@ -66,11 +67,18 @@ export default function UsuariosPage() {
     };
   }
 
+  interface ItemToDelete {
+    id: number;
+    title: string;
+  }
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<ItemToDelete | null>(null);
+
   const [roles, setRoles] = useState<Role[]>([]);
 
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -139,6 +147,36 @@ export default function UsuariosPage() {
       setModalMessage("Error del servidor al crear el usuario");
       setModalOpen(true);
       console.error("Error al crear el usuario:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = (item: Usuario) => {
+    setItemToDelete({ id: item.id, title: item.full_name });
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async (id: number) => {
+    const userDelete = new UserService();
+    setLoading(true);
+    try {
+      const response = await userDelete.deleteUser(id);
+      if (response) {
+        setModalMessage("Usuario eliminado exitosamente");
+        setModalOpen(true);
+        await fetchUsers();
+        setIsAddModalOpen(false);
+      } else {
+        setModalMessage(
+          "Hubo un error al eliminar el usuario. Intentelo nuevamente"
+        );
+        setModalOpen(true);
+      }
+    } catch (error) {
+      setModalMessage("Error del servidor al eliminar el usuario");
+      setModalOpen(true);
+      console.error("Error al eliminar el usuario:", error);
     } finally {
       setLoading(false);
     }
@@ -269,11 +307,11 @@ export default function UsuariosPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Editar</span>
-                        </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          onClick={() => handleDelete(usuario)}
+                          variant="ghost"
+                          size="icon"
+                        >
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Eliminar</span>
                         </Button>
@@ -333,6 +371,14 @@ export default function UsuariosPage() {
         message={modalMessage}
         title="Notificación"
         variant="info"
+      />
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() =>
+          itemToDelete?.id !== undefined && confirmDelete(itemToDelete.id)
+        }
+        itemTitle={itemToDelete?.title || ""}
       />
     </>
   );
