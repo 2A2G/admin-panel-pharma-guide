@@ -25,12 +25,10 @@ export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setLoading(true);
-    e.preventDefault();
     setIsLoading(true);
+    e.preventDefault();
     setError("");
 
     const formData = new FormData(e.currentTarget);
@@ -49,13 +47,13 @@ export default function LoginPage() {
         setError("Credenciales inválidas. Intente nuevamente.");
       }
     } catch (err: any) {
-      setError(err.message || "Error al iniciar sesión. Intente nuevamente.");
+      setError("Error al iniciar sesión. Intente nuevamente.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen bg-white">
         <div className="flex flex-col items-center">
