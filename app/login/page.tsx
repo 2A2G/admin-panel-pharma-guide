@@ -19,13 +19,16 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import isotipo from "../img/isotipo_.png";
 import { AccesService } from "@/app/backend/access/acces";
+import LoadingCircles from "@/components/ui/loading";
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
     e.preventDefault();
     setIsLoading(true);
     setError("");
@@ -52,17 +55,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      const accesService = new AccesService();
-      await accesService.logout();
-      document.cookie = "auth_token=; path=/; max-age=0";
-      router.push("/login");
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
-  };
-
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-white">
+        <div className="flex flex-col items-center">
+          <LoadingCircles />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
       <Card className="w-full max-w-md shadow-lg">
