@@ -9,7 +9,7 @@ const urlRegister = `${urlBas}/api/access/pharma-guide/register`;
 
 export class UserService {
   async createUser(full_name: string, email: string, roleId: number) {
-    const user = { full_name, email, roleId };
+    const user = { full_name, email, roleId: Number(roleId) };
 
     try {
       const token = await AccessTokenService.getToken();
