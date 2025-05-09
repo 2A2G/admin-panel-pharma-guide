@@ -88,7 +88,7 @@ export default function UsuariosPage() {
   const fetchUsers = async () => {
     const userService = new UserService();
     try {
-      const user = await userService.getUser();
+      const user = await userService.getUsers();
       setUsuarios(user.data);
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
