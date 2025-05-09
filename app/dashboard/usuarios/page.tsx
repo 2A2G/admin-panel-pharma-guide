@@ -88,7 +88,8 @@ export default function UsuariosPage() {
   const fetchUsers = async () => {
     const userService = new UserService();
     try {
-      const user = await userService.getUser();
+      const user = await userService.getUsers();
+
       setUsuarios(user.data);
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
@@ -101,7 +102,7 @@ export default function UsuariosPage() {
     const role = new roleService();
     setLoading(true);
     try {
-      const response = await role.getRole();
+      const response = await role.getRoles();
 
       if (Array.isArray(response)) {
         setRoles(response);

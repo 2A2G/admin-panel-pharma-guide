@@ -74,30 +74,6 @@ export class statusService {
     }
   }
 
-  async deleteStaus(idStatus: number) {
-    try {
-      if (!idStatus || idStatus === null) {
-        throw new Error("El id del estado no esta presente");
-      }
-      const token = await statusService.getToken();
-
-      const response = await axios.delete(`${urlBase + "/status"}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        data: { id: idStatus },
-      });
-
-      if (response.status === 200) {
-        return response.data;
-      } else {
-        throw new Error("Errr en el serrvidor no se pudo eliminar el estado");
-      }
-    } catch (error: any) {
-      throw new Error(error?.message || "Error al eliminar el estado");
-    }
-  }
-
   async updateStaus(updateStatus: updateStatus) {
     try {
       const { idRole, name, isDeleted } = updateStatus;
@@ -109,9 +85,8 @@ export class statusService {
       const token = await statusService.getToken();
 
       const response = await axios.put(
-        `${urlBase}/status`,
+        `${urlBase}/status/${idRole}`,
         {
-          id: idRole,
           name: name,
           isDeleted: isDeleted,
         },
@@ -131,6 +106,29 @@ export class statusService {
       }
     } catch (error: any) {
       throw new Error(error?.message || "Error al actualizar el estado");
+    }
+  }
+
+  async deleteStaus(idStatus: number) {
+    try {
+      if (!idStatus || idStatus === null) {
+        throw new Error("El id del estado no esta presente");
+      }
+      const token = await statusService.getToken();
+
+      const response = await axios.delete(`${urlBase}/status/${idStatus}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Errr en el serrvidor no se pudo eliminar el estado");
+      }
+    } catch (error: any) {
+      throw new Error(error?.message || "Error al eliminar el estado");
     }
   }
 }

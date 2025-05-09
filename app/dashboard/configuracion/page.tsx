@@ -88,15 +88,16 @@ export default function RoleTable() {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<ItemToDelete | null>(null);
+  const [isAddRoleModalOpen, setIsAddRoleModalOpen] = useState(false);
+  const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState(false);
 
   const fetchRoles = async () => {
     const role = new roleService();
     setLoading(true);
     try {
-      const response = await role.getRole();
+      const response = await role.getRoles();
 
       if (Array.isArray(response)) {
         setRoles(response);
@@ -159,7 +160,7 @@ export default function RoleTable() {
         setModalMessage("Rol creado correctamente");
         setModalOpen(true);
         await fetchRoles();
-        setIsAddModalOpen(false);
+        setIsAddRoleModalOpen(false);
       } else {
         setModalMessage("Error al crear el rol");
         setModalOpen(true);
@@ -230,7 +231,7 @@ export default function RoleTable() {
         setModalMessage("Estado creado correctamente");
         setModalOpen(true);
         await feachStatus();
-        setIsAddModalOpen(false);
+        setIsAddStatusModalOpen(false);
       } else {
         setModalMessage("Error al crear el estado");
         setModalOpen(true);
@@ -330,11 +331,11 @@ export default function RoleTable() {
           <Card className="flex-1 min-w-[350px]">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Roles</h2>
-              <Button onClick={() => setIsAddModalOpen(true)}>
+              <Button onClick={() => setIsAddRoleModalOpen(true)}>
                 Agregar Rol
               </Button>
 
-              {isAddModalOpen && (
+              {isAddRoleModalOpen && (
                 <EditModal
                   title="Agregar Rol"
                   description="Ingresa el nombre del nuevo rol."
@@ -342,8 +343,8 @@ export default function RoleTable() {
                     { name: "name", label: "Nombre del Rol", type: "text" },
                   ]}
                   data={{ name: "" }}
-                  isOpen={isAddModalOpen}
-                  setIsOpen={setIsAddModalOpen}
+                  isOpen={isAddRoleModalOpen}
+                  setIsOpen={setIsAddRoleModalOpen}
                   onSubmit={(formData: Record<string, any>) =>
                     handelCreateRole(formData as CreateRole)
                   }
@@ -461,11 +462,11 @@ export default function RoleTable() {
           <Card className="flex-1 min-w-[350px]">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Estados</h2>
-              <Button onClick={() => setIsAddModalOpen(true)}>
+              <Button onClick={() => setIsAddStatusModalOpen(true)}>
                 Agregar Estado
               </Button>
 
-              {isAddModalOpen && (
+              {isAddStatusModalOpen && (
                 <EditModal
                   title="Agregar Estado"
                   description="Ingresa el nombre del nuevo estado."
@@ -473,8 +474,8 @@ export default function RoleTable() {
                     { name: "name", label: "Nombre del estado", type: "text" },
                   ]}
                   data={{ name: "" }}
-                  isOpen={isAddModalOpen}
-                  setIsOpen={setIsAddModalOpen}
+                  isOpen={isAddStatusModalOpen}
+                  setIsOpen={setIsAddStatusModalOpen}
                   onSubmit={(formData: Record<string, any>) =>
                     handelCreateStatus(formData as CreateStatus)
                   }

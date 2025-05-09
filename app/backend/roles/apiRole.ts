@@ -37,7 +37,7 @@ export class roleService {
     }
   }
 
-  async getRole() {
+  async getRoles() {
     try {
       const token = await AccessTokenService.getToken();
       if (!token) {
@@ -70,7 +70,7 @@ export class roleService {
       if (!token) {
         throw new Error("No se encontró el token de autenticación.");
       }
-      const response = await axios.put(`${urlBase}`, role, {
+      const response = await axios.put(`${urlBase}/${role.idRole}`, role, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -93,11 +93,10 @@ export class roleService {
         throw new Error("No se encontró el token de autenticación.");
       }
 
-      const response = await axios.delete(`${urlBase}`, {
+      const response = await axios.delete(`${urlBase}/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        data: { id },
       });
 
       if (response.status === 200) {

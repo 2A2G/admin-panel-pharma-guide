@@ -9,7 +9,7 @@ const urlRegister = `${urlBas}/api/access/pharma-guide/register`;
 
 export class UserService {
   async createUser(full_name: string, email: string, roleId: number) {
-    const user = { full_name, email, roleId };
+    const user = { full_name, email, roleId: Number(roleId) };
 
     try {
       const token = await AccessTokenService.getToken();
@@ -30,7 +30,7 @@ export class UserService {
     }
   }
 
-  async getUser() {
+  async getUsers() {
     try {
       const token = await AccessTokenService.getToken();
       if (!token) {
@@ -61,17 +61,14 @@ export class UserService {
     try {
       const token = await AccessTokenService.getToken();
 
-      const response = await axios.delete(`${urlBase}`, {
+      const response = await axios.delete(`${urlBase}/${idUser}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        data: {
-          idUser,
-        },
       });
 
-      if (response.status === 200) {
-        return response.data;
+      if (response.status === 204) {
+        return true;
       } else {
         throw new Error("Error al eliminar el usuario.");
       }
