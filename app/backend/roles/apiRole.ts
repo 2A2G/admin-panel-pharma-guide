@@ -87,7 +87,7 @@ export class roleService {
     }
   }
 
-  async deleteRole(id: number) {
+  async deleteRole(id: Number) {
     try {
       const token = await AccessTokenService.getToken();
       if (!token) {
@@ -100,8 +100,8 @@ export class roleService {
         },
       });
 
-      if (response.status === 200) {
-        return response.data;
+      if (response.status === 204) {
+        return { message: "Role deleted successfully" };
       } else {
         throw new Error("Error en la respuesta del servidor.");
       }

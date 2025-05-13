@@ -140,6 +140,18 @@ export default function RoleTable() {
     }
   };
 
+  const handelConfirmDelete = (id: number, title: string) => {
+    setItemToDelete({ id, title, caso: "rol" });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirmation = () => {
+    if (itemToDelete?.id !== undefined) {
+      handelDeleteRole(itemToDelete.id);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   const handelDeleteRole = async (id: number) => {
     const role = new roleService();
     setLoading(true);
@@ -271,7 +283,7 @@ export default function RoleTable() {
                               aria-label="Eliminar"
                               onClick={async () => {
                                 {
-                                  await handelDeleteRole(rol.id);
+                                  await handelConfirmDelete(rol.id, "Rol");
                                 }
                               }}
                             >
@@ -324,7 +336,7 @@ export default function RoleTable() {
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => itemToDelete?.id !== undefined}
+        onConfirm={handleDeleteConfirmation}
         itemTitle={itemToDelete?.title || ""}
       />
     </>
