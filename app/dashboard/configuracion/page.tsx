@@ -176,11 +176,10 @@ export default function RoleTable() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight">
-            Gestión de Roles y Estados
+            Gestión de Roles
           </h1>
           <p className="text-muted-foreground">
-            Aquí puedes gestionar los roles y estados de los usuarios en el
-            sistema.
+            Aquí puedes gestionar los roles de los usuarios en el sistema.
           </p>
         </div>
 
