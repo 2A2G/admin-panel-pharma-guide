@@ -2,8 +2,9 @@ import { AccessTokenService } from "@/app/api/accesToken";
 import axios from "axios";
 
 export interface Rol {
-  idRole: number;
-  idStatus: number;
+  id: Number;
+  name: String;
+  isDeleted: Boolean;
 }
 
 const urlBas = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
@@ -70,7 +71,7 @@ export class roleService {
       if (!token) {
         throw new Error("No se encontró el token de autenticación.");
       }
-      const response = await axios.put(`${urlBase}/${role.idRole}`, role, {
+      const response = await axios.put(`${urlBase}/${role.id}`, role, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
