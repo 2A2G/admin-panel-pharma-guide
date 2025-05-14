@@ -54,11 +54,6 @@ const items: NavItem[] = [
     icon: <FlaskConical className="h-5 w-5 text-green-600" />,
   },
   {
-    title: "Contenido",
-    href: "/dashboard/contenido",
-    icon: <FileText className="h-5 w-5 text-green-600" />,
-  },
-  {
     title: "Estadísticas",
     href: "/dashboard/estadisticas",
     icon: <BarChart3 className="h-5 w-5 text-green-600" />,
