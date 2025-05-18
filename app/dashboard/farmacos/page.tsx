@@ -27,8 +27,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import { DrugService } from "@/app/backend/drugs/apiDrug";
+import LoadingCircles from "@/components/ui/loading";
+
+interface Drug {
+  id: number;
+  name_generic: string;
+  brand_name: string;
+  mechanism_of_actionv: string;
+  therapeutic_class: string;
+  tags: string;
+  isDeleted: Boolean;
+  userId: number;
+}
 
 export default function MedicamentosPage() {
+  const [drug, setDrug] = useState<Drug[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchDrug = async () => {
+    const drug = new DrugService();
+    try {
+      const response = await drug.getDrugs();
+      if (Array.isArray(response)) {
+        setDrug(response);
+      } else if (response.data && Array.isArray(response.data)) {
+        setDrug(response.data);
+      } else {
+        console.error("Formato de respuesta no esperado:", response);
+      }
+    } catch (error) {
+      console.error("Error al obtener roles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <LoadingCircles />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
