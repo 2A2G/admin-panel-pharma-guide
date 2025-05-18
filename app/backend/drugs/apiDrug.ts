@@ -6,6 +6,7 @@ const urlBase = `${urlBas}/api/pharma-guide/drug`;
 
 export class DrugService {
   async getDrugs() {
+    console.log(urlBase);
     try {
       const token = await AccessTokenService.getToken();
 

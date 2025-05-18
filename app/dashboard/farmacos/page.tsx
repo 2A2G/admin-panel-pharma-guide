@@ -1,6 +1,6 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -10,24 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Edit,
-  Plus,
-  Search,
-  Trash2,
-  Upload,
-} from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
+import { ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { DrugService } from "@/app/backend/drugs/apiDrug";
 import LoadingCircles from "@/components/ui/loading";
 
@@ -35,22 +19,34 @@ interface Drug {
   id: number;
   name_generic: string;
   brand_name: string;
-  mechanism_of_actionv: string;
+  mechanism_of_action: string;
   therapeutic_class: string;
   tags: string;
   isDeleted: Boolean;
-  userId: number;
+  createdAt: Date;
+  user: {
+    full_name: string;
+  };
 }
 
-export default function MedicamentosPage() {
+export default function FarmacosPage() {
   const [drug, setDrug] = useState<Drug[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchDrug = async () => {
-    const drug = new DrugService();
+    const drugs = new DrugService();
     try {
-      const response = await drug.getDrugs();
-      if (Array.isArray(response)) {
+      const response = await drugs.getDrugs();
+      if (
+        !response ||
+        (Array.isArray(response) && response.length === 0) ||
+        (response.data &&
+          Array.isArray(response.data) &&
+          response.data.length === 0)
+      ) {
+        setDrug([]);
+        console.log("No hay registros de medicamentos.");
+      } else if (Array.isArray(response)) {
         setDrug(response);
       } else if (response.data && Array.isArray(response.data)) {
         setDrug(response.data);
@@ -63,6 +59,10 @@ export default function MedicamentosPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDrug();
+  }, []);
 
   if (loading) {
     return (
@@ -80,62 +80,11 @@ export default function MedicamentosPage() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Buscar medicamentos..."
-              className="pl-8 w-full sm:w-[300px]"
-            />
-          </div>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filtrar por categoría" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas las categorías</SelectItem>
-              <SelectItem value="analgesicos">Analgésicos</SelectItem>
-              <SelectItem value="antibioticos">Antibióticos</SelectItem>
-              <SelectItem value="antialergicos">Antialérgicos</SelectItem>
-              <SelectItem value="antiinflamatorios">
-                Antiinflamatorios
-              </SelectItem>
-              <SelectItem value="antiacidos">Antiácidos</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Upload className="h-4 w-4" />
-            <span>Importar</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Download className="h-4 w-4" />
-            <span>Exportar</span>
-          </Button>
-          <Button size="sm" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            <span>Añadir Medicamento</span>
-          </Button>
-        </div>
-      </div>
-
       <Card>
         <div className="overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">ID</TableHead>
                 <TableHead className="min-w-[150px]">Nombre</TableHead>
                 <TableHead className="min-w-[150px]">
                   Principio Activo
@@ -143,109 +92,65 @@ export default function MedicamentosPage() {
                 <TableHead>Categoría</TableHead>
                 <TableHead>Laboratorio</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Creado por</TableHead>
+                <TableHead>Fecha de Creación</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {[
-                {
-                  id: 1,
-                  nombre: "Paracetamol 500mg",
-                  principioActivo: "Paracetamol",
-                  categoria: "Analgésicos",
-                  laboratorio: "Bayer",
-                  estado: "Activo",
-                },
-                {
-                  id: 2,
-                  nombre: "Ibuprofeno 400mg",
-                  principioActivo: "Ibuprofeno",
-                  categoria: "Antiinflamatorios",
-                  laboratorio: "Pfizer",
-                  estado: "Activo",
-                },
-                {
-                  id: 3,
-                  nombre: "Amoxicilina 500mg",
-                  principioActivo: "Amoxicilina",
-                  categoria: "Antibióticos",
-                  laboratorio: "GSK",
-                  estado: "Activo",
-                },
-                {
-                  id: 4,
-                  nombre: "Loratadina 10mg",
-                  principioActivo: "Loratadina",
-                  categoria: "Antialérgicos",
-                  laboratorio: "Sanofi",
-                  estado: "Inactivo",
-                },
-                {
-                  id: 5,
-                  nombre: "Omeprazol 20mg",
-                  principioActivo: "Omeprazol",
-                  categoria: "Antiácidos",
-                  laboratorio: "AstraZeneca",
-                  estado: "Activo",
-                },
-                {
-                  id: 6,
-                  nombre: "Aspirina 100mg",
-                  principioActivo: "Ácido acetilsalicílico",
-                  categoria: "Analgésicos",
-                  laboratorio: "Bayer",
-                  estado: "Activo",
-                },
-                {
-                  id: 7,
-                  nombre: "Cetirizina 10mg",
-                  principioActivo: "Cetirizina",
-                  categoria: "Antialérgicos",
-                  laboratorio: "Novartis",
-                  estado: "Activo",
-                },
-              ].map((medicamento) => (
-                <TableRow key={medicamento.id}>
-                  <TableCell className="font-medium">
-                    {medicamento.id}
-                  </TableCell>
-                  <TableCell className="min-w-[150px]">
-                    {medicamento.nombre}
-                  </TableCell>
-                  <TableCell>{medicamento.principioActivo}</TableCell>
-                  <TableCell>{medicamento.categoria}</TableCell>
-                  <TableCell>{medicamento.laboratorio}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        medicamento.estado === "Activo"
-                          ? "success"
-                          : "secondary"
-                      }
-                    >
-                      {medicamento.estado}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Editar</span>
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Eliminar</span>
-                      </Button>
-                    </div>
+              {drug.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="text-center text-muted-foreground"
+                  >
+                    No hay medicamentos registrados.
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                drug.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="min-w-[150px]">
+                      {item.name_generic}
+                    </TableCell>
+                    <TableCell>{item.brand_name}</TableCell>
+                    <TableCell>{item.mechanism_of_action}</TableCell>
+                    <TableCell>{item.therapeutic_class}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={item.isDeleted ? "destructive" : "success"}
+                      >
+                        {item.isDeleted ? "Eliminado" : "Activo"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{item.user?.full_name ?? "-"}</TableCell>
+                    <TableCell>
+                      {item.createdAt
+                        ? new Date(item.createdAt).toLocaleDateString()
+                        : "-"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon">
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Eliminar</span>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
         <div className="flex items-center justify-between px-4 py-4 border-t">
           <div className="text-sm text-muted-foreground">
-            Mostrando <strong>7</strong> de <strong>42</strong> medicamentos
+            Mostrando <strong>{drug.length}</strong> de{" "}
+            <strong>{drug.length}</strong> medicamentos
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="icon" disabled>
