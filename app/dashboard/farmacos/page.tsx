@@ -74,9 +74,9 @@ export default function FarmacosPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Medicamentos</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Farmacos</h1>
         <p className="text-muted-foreground">
-          Gestiona los medicamentos disponibles en la aplicación.
+          Gestiona los farmacos disponibles en la aplicación.
         </p>
       </div>
 
