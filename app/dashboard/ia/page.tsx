@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,25 +10,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Edit, Search, Trash2 } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { useEffect } from "react";
-import { StudyPlanService } from "@/app/backend/studyPlan/apiStudyPlan";
+import {
+  ManagementIa,
+  managementIAService,
+} from "@/app/backend/management-ia/management-ia";
 import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
-import EditModal from "@/components/ui/editModal";
 
 export default function ManagementIAPage() {
+  const [managementIA, setManagementIA] = useState<ManagementIa[]>([]);
   const [loading, setLoading] = useState(true);
 
-  //   if (loading) {
-  //     return (
-  //       <div className="flex justify-center items-center h-[60vh]">
-  //         <LoadingCircles />
-  //       </div>
-  //     );
-  //   }
+  useEffect(() => {
+    const fetchManagementIA = async () => {
+      const managementIA = new managementIAService();
+      try {
+        const dataManagemetIA = await managementIA.getManagementIA();
+        setManagementIA(dataManagemetIA.data);
+      } catch (error) {
+        setManagementIA([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchManagementIA();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <LoadingCircles />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -72,7 +88,32 @@ export default function ManagementIAPage() {
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody></TableBody>
+            <TableBody>
+              {managementIA.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="text-center text-muted-foreground"
+                  >
+                    No hay Modelos de IA registrados
+                  </TableCell>
+                </TableRow>
+              ) : (
+                managementIA.map((ia) => (
+                  <TableRow key={ia.id}>
+                    <TableCell>{ia.name}</TableCell>
+                    <TableCell>{ia.provider}</TableCell>
+                    <TableCell>{ia.model}</TableCell>{" "}
+                    <TableCell>{ia.createdAt}</TableCell>
+                    <TableCell>{ia.status}</TableCell>
+                    <TableCell>{ia.isDelete}</TableCell>
+                    <TableCell className="text-right">
+                      {/* Acciones aquí */}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
           </Table>
         </div>
       </Card>

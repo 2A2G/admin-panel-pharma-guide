@@ -1,8 +1,15 @@
 import { AccessTokenService } from "@/app/api/accesToken";
 import axios from "axios";
-import { headers } from "next/headers";
 
-export interface ManagementIa {}
+export interface ManagementIa {
+  id: number;
+  provider: string;
+  model: string;
+  createdAt: string;
+  status: boolean;
+  isDelete: string;
+  name: string;
+}
 
 const urlBas = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
 const urlBase = `${urlBas}/api/pharma-guide/ia-management`;
@@ -32,7 +39,7 @@ export class managementIAService {
     }
   }
 
-  async getManagementIA() {
+  async getManagementIA(): Promise<any> {
     try {
       const token = await AccessTokenService.getToken();
       const response = await axios.get(`${urlBase}`, {
@@ -48,7 +55,7 @@ export class managementIAService {
       }
     } catch (error: any) {
       throw new Error(
-        error?.message || "Error al obtener los modelo de IA registrados"
+        error?.message || "Error al obtener los modelos de IA registrados"
       );
     }
   }
