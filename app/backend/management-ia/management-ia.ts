@@ -1,5 +1,6 @@
 import { AccessTokenService } from "@/app/api/accesToken";
 import axios from "axios";
+import { headers } from "next/headers";
 
 export interface ManagementIa {}
 
@@ -49,6 +50,25 @@ export class managementIAService {
       throw new Error(
         error?.message || "Error al obtener los modelo de IA registrados"
       );
+    }
+  }
+
+  async getOneManagement(managementId: number) {
+    try {
+      const token = await AccessTokenService.getToken();
+
+      const response = await axios.get(`${urlBase}/${managementId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Error en la respuesta del servidor");
+      }
+    } catch (error: any) {
+      throw new Error(error?.message || "Error al obtner el modelo de IA");
     }
   }
 }
