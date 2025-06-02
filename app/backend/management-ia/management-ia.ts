@@ -28,7 +28,7 @@ export class managementIAService {
         throw new Error("Error en la respuesta del servidor.");
       }
     } catch (error: any) {
-      throw new Error(error?.message || "Error al crear el modjelo de IA");
+      throw new Error(error?.message || "Error al crear el modelo de IA");
     }
   }
 
@@ -69,6 +69,28 @@ export class managementIAService {
       }
     } catch (error: any) {
       throw new Error(error?.message || "Error al obtner el modelo de IA");
+    }
+  }
+
+  async deleteManagementIA(managementId: number) {
+    try {
+      const token = await AccessTokenService.getToken();
+
+      const response = await axios.delete(`${urlBase}/${managementId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 204) {
+        return response.data;
+      } else {
+        throw new Error("Error en la respusta del servidor");
+      }
+    } catch (error: any) {
+      throw new Error(
+        error?.message || "Error al eliminar el modelo de IA seleccionado"
+      );
     }
   }
 }
