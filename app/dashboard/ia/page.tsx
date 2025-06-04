@@ -10,8 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search } from "lucide-react";
-
 import { useEffect } from "react";
 import {
   ManagementIa,
@@ -19,25 +17,52 @@ import {
 } from "@/app/backend/management-ia/management-ia";
 import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
+import NotificationModal from "@/components/ui/notificationModal";
+import { Button } from "@/components/ui/button";
+import EditModal from "@/components/ui/editModal";
+import { Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default function ManagementIAPage() {
   const [managementIA, setManagementIA] = useState<ManagementIa[]>([]);
   const [loading, setLoading] = useState(true);
+  const [addNewManagementIA, setAddNewManagementIA] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const fetchManagementIA = async () => {
+    const managementIA = new managementIAService();
+    try {
+      const dataManagemetIA = await managementIA.getManagementIA();
+      setManagementIA(dataManagemetIA.data);
+      console.log(dataManagemetIA);
+    } catch (error) {
+      setManagementIA([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchManagementIA = async () => {
-      const managementIA = new managementIAService();
-      try {
-        const dataManagemetIA = await managementIA.getManagementIA();
-        setManagementIA(dataManagemetIA.data);
-      } catch (error) {
-        setManagementIA([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchManagementIA();
   }, []);
+
+  const handelCreateModelIA = async (formData: ManagementIa) => {
+    try {
+      setLoading(true);
+      const managementIAService_ = new managementIAService();
+      await managementIAService_.createManagementIa(formData);
+      setModalMessage("Modelo de IA creado exitosamente");
+      setModalOpen(true);
+      await fetchManagementIA();
+    } catch (error: any) {
+      console.error("Error al crear modelo de IA:", error);
+      setModalMessage(error.message || "Error al crear modelo de IA");
+      setModalOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -59,20 +84,64 @@ export default function ManagementIAPage() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Buscar usuarios..."
-              className="pl-8 w-full sm:w-[300px]"
-            />
-          </div>
-        </div>
-      </div>
-
       <Card>
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-lg font-semibold">Roles</h2>
+          <Button onClick={() => setAddNewManagementIA(true)}>
+            Agregar Modelo de IA
+          </Button>
+
+          {addNewManagementIA && (
+            <EditModal
+              title="Agregar Modelo de IA"
+              description="Ingresa los datos del nuevo modelo de IA."
+              fields={[
+                {
+                  name: "name",
+                  label: "Nombre del modelo de IA",
+                  type: "text",
+                },
+                {
+                  name: "provider",
+                  label: "Nombre del Proveedor",
+                  type: "text",
+                },
+                {
+                  name: "model",
+                  label: "Nombre del Modelo de IA",
+                  type: "text",
+                },
+                {
+                  name: "version",
+                  label: "Versión del Modelo de IA",
+                  type: "text",
+                },
+                {
+                  name: "api_key",
+                  label: "Clave del Modelo de IA",
+                  type: "password",
+                  showToggle: true,
+                },
+                {
+                  name: "url_api",
+                  label: "Url de acceso al modelo de IA",
+                  type: "text",
+                },
+                {
+                  name: "prompt_description",
+                  label: "Digite el contexto que tendrá el modelo de IA",
+                  type: "text",
+                },
+              ]}
+              data={{ name: "" }}
+              isOpen={addNewManagementIA}
+              setIsOpen={setAddNewManagementIA}
+              onSubmit={(formData: Record<string, any>) =>
+                handelCreateModelIA(formData as ManagementIa)
+              }
+            />
+          )}
+        </div>
         <div className="overflow-auto">
           <Table>
             <TableHeader>
@@ -85,6 +154,7 @@ export default function ManagementIAPage() {
                   Fecha de registro
                 </TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Estado del Registro</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -103,12 +173,65 @@ export default function ManagementIAPage() {
                   <TableRow key={ia.id}>
                     <TableCell>{ia.name}</TableCell>
                     <TableCell>{ia.provider}</TableCell>
-                    <TableCell>{ia.model}</TableCell>{" "}
-                    <TableCell>{ia.createdAt}</TableCell>
-                    <TableCell>{ia.status}</TableCell>
-                    <TableCell>{ia.isDelete}</TableCell>
+                    <TableCell>{ia.model}</TableCell>
+                    <TableCell>{ia.version}</TableCell>
+                    <TableCell>
+                      {" "}
+                      {new Date(ia.createdAt).toLocaleDateString("es-ES")}
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Badge
+                        variant={
+                          ia.isDeleted
+                            ? "destructive"
+                            : ia.status
+                            ? "success"
+                            : "secondary"
+                        }
+                        className="block text-center"
+                      >
+                        {ia.isDeleted
+                          ? "Eliminado"
+                          : ia.status
+                          ? "En uso"
+                          : "Sin uso"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {ia.isDeleted ? (
+                        <span className="text-red-500 font-semibold">
+                          Eliminado
+                        </span>
+                      ) : (
+                        <span className="text-blue-600 font-semibold">
+                          Listo para usar
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
-                      {/* Acciones aquí */}
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          // onClick={() => }
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Eliminar"
+                          // onClick={async () => {
+                          //   {
+                          //     await handelConfirmDelete(rol.id, "Rol");
+                          //   }
+                          // }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Eliminar</span>
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -117,6 +240,13 @@ export default function ManagementIAPage() {
           </Table>
         </div>
       </Card>
+      <NotificationModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        message={modalMessage}
+        title="Notificación"
+        variant="info"
+      />
     </div>
   );
 }

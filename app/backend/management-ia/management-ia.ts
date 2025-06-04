@@ -3,12 +3,13 @@ import axios from "axios";
 
 export interface ManagementIa {
   id: number;
+  name: string;
   provider: string;
+  version: string;
   model: string;
   createdAt: string;
   status: boolean;
-  isDelete: string;
-  name: string;
+  isDeleted: string;
 }
 
 const urlBas = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
@@ -16,18 +17,15 @@ const urlBase = `${urlBas}/api/pharma-guide/ia-management`;
 
 export class managementIAService {
   async createManagementIa(managementIa: ManagementIa) {
+    console.log(managementIa);
     try {
       const token = await AccessTokenService.getToken();
 
-      const response = await axios.post(
-        `${urlBase}`,
-        { data: managementIa },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.post(`${urlBase}`, managementIa, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status === 201) {
         return response.data;

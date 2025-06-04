@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PillIcon as Capsule, Icon, Lock, User } from "lucide-react";
+import { PillIcon as Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,7 +27,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsLoading(true);
     e.preventDefault();
     setError("");
 
@@ -36,7 +35,6 @@ export default function LoginPage() {
     const password = formData.get("password") as string;
 
     const accesService = new AccesService();
-
     try {
       const isAuthenticated = await accesService.login({ username, password });
 

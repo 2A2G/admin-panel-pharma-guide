@@ -36,9 +36,11 @@ interface EditModalProps {
       | "date"
       | "textarea"
       | "select"
+      | "password"
       | "checkbox";
     options?: { value: string; label: string }[];
     placeholder?: string;
+    showToggle?: boolean;
   }>;
   data?: Record<string, any>;
   onSubmit: (formData: Record<string, any>) => void;
@@ -72,12 +74,11 @@ export default function EditModal({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     onSubmit(formData);
     setIsOpen(false);
   };
-
   const renderField = (field: {
     name: string;
     label: string;
@@ -89,9 +90,11 @@ export default function EditModal({
       | "textarea"
       | "select"
       | "checkbox"
+      | "password"
       | undefined;
     options?: { value: string; label: string }[] | undefined;
     placeholder?: string | undefined;
+    showToggle?: boolean;
   }) => {
     const {
       name,
@@ -165,6 +168,37 @@ export default function EditModal({
               onCheckedChange={(checked) => handleChange(name, checked)}
             />
             <Label htmlFor={name}>{label}</Label>
+          </div>
+        );      case "password":
+        return (
+          <div className="grid gap-2" key={name}>
+            <Label htmlFor={name}>{label}</Label>
+            <div className="relative">
+              <Input
+                id={name}
+                name={name}
+                type={formData[`__show_${name}`] ? "text" : "password"}
+                value={formData[name] || ""}
+                onChange={(e) => handleChange(name, e.target.value)}
+                placeholder={placeholder}
+                autoComplete="new-password"
+              />
+              {(field.showToggle !== false) && (
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground"
+                  tabIndex={-1}
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      [`__show_${name}`]: !prev[`__show_${name}`],
+                    }))
+                  }
+                >
+                  {formData[`__show_${name}`] ? "Ocultar" : "Mostrar"}
+                </button>
+              )}
+            </div>
           </div>
         );
 
