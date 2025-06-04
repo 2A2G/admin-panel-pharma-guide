@@ -1,7 +1,6 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -22,20 +21,27 @@ import { Button } from "@/components/ui/button";
 import EditModal from "@/components/ui/editModal";
 import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import DeleteModal from "@/components/ui/deleteModal";
 
+interface ItemToDelete {
+  idModelIA: number;
+  nameModelIA: string;
+}
 export default function ManagementIAPage() {
   const [managementIA, setManagementIA] = useState<ManagementIa[]>([]);
   const [loading, setLoading] = useState(true);
   const [addNewManagementIA, setAddNewManagementIA] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<ItemToDelete | null>(null);
+
+  const managementIAService_ = new managementIAService();
 
   const fetchManagementIA = async () => {
-    const managementIA = new managementIAService();
     try {
-      const dataManagemetIA = await managementIA.getManagementIA();
+      const dataManagemetIA = await managementIAService_.getManagementIA();
       setManagementIA(dataManagemetIA.data);
-      console.log(dataManagemetIA);
     } catch (error) {
       setManagementIA([]);
     } finally {
@@ -50,7 +56,6 @@ export default function ManagementIAPage() {
   const handelCreateModelIA = async (formData: ManagementIa) => {
     try {
       setLoading(true);
-      const managementIAService_ = new managementIAService();
       await managementIAService_.createManagementIa(formData);
       setModalMessage("Modelo de IA creado exitosamente");
       setModalOpen(true);
@@ -59,6 +64,42 @@ export default function ManagementIAPage() {
       console.error("Error al crear modelo de IA:", error);
       setModalMessage(error.message || "Error al crear modelo de IA");
       setModalOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handelConfirmDelete = async (
+    idModelIA: number,
+    nameModelIA: string
+  ) => {
+    if (!(idModelIA && nameModelIA) || isNaN(idModelIA)) {
+      setModalMessage("ID de modelo de IA inválido");
+      setIsDeleteModalOpen(false);
+      return;
+    }
+    setItemToDelete({ idModelIA, nameModelIA });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirmation = async () => {
+    if (itemToDelete?.idModelIA !== undefined) {
+      handelDeleteModelIA(itemToDelete.idModelIA);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handelDeleteModelIA = async (idModelIA: number) => {
+    try {
+      setLoading(true);
+      await managementIAService_.deleteManagementIA(idModelIA);
+      setModalMessage("Modelo de IA eliminado exitosamente");
+      setModalOpen(true);
+      await fetchManagementIA();
+    } catch (error: any) {
+      setModalMessage("Error inesperado al eliminar el rol");
+      setModalOpen(true);
+      console.log("Hubo un error al eliminar el modelo de IA: ", error);
     } finally {
       setLoading(false);
     }
@@ -222,11 +263,11 @@ export default function ManagementIAPage() {
                           variant="ghost"
                           size="icon"
                           aria-label="Eliminar"
-                          // onClick={async () => {
-                          //   {
-                          //     await handelConfirmDelete(rol.id, "Rol");
-                          //   }
-                          // }}
+                          onClick={async () => {
+                            {
+                              await handelConfirmDelete(ia.id, ia.name);
+                            }
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Eliminar</span>
@@ -246,6 +287,12 @@ export default function ManagementIAPage() {
         message={modalMessage}
         title="Notificación"
         variant="info"
+      />
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirmation}
+        itemTitle={itemToDelete?.nameModelIA || ""}
       />
     </div>
   );
