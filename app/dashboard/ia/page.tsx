@@ -69,6 +69,21 @@ export default function ManagementIAPage() {
     }
   };
 
+  const handelActivarModelIA = async (modelIA: ManagementIa) => {
+    const isDeleted =
+      typeof modelIA.isDeleted === "string"
+        ? modelIA.isDeleted === "true"
+        : Boolean(modelIA.isDeleted);
+
+    if (isDeleted) {
+      setModalMessage(
+        "Este modelo de IA está eliminado y no puede ser activado."
+      );
+      setModalOpen(true);
+      return;
+    }
+  };
+
   const handelConfirmDelete = async (
     idModelIA: number,
     nameModelIA: string
@@ -127,7 +142,7 @@ export default function ManagementIAPage() {
 
       <Card>
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">Roles</h2>
+          <h2 className="text-lg font-semibold">Modelos IA</h2>
           <Button onClick={() => setAddNewManagementIA(true)}>
             Agregar Modelo de IA
           </Button>
@@ -210,72 +225,132 @@ export default function ManagementIAPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                managementIA.map((ia) => (
-                  <TableRow key={ia.id}>
-                    <TableCell>{ia.name}</TableCell>
-                    <TableCell>{ia.provider}</TableCell>
-                    <TableCell>{ia.model}</TableCell>
-                    <TableCell>{ia.version}</TableCell>
-                    <TableCell>
-                      {" "}
-                      {new Date(ia.createdAt).toLocaleDateString("es-ES")}
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <Badge
-                        variant={
-                          ia.isDeleted
-                            ? "destructive"
+                managementIA
+                  .slice()
+                  .sort((a, b) => {
+                    if (a.status !== b.status) {
+                      return a.status ? -1 : 1;
+                    }
+                    if (a.isDeleted !== b.isDeleted) {
+                      return a.isDeleted ? 1 : -1;
+                    }
+                    return 0;
+                  })
+                  .map((ia) => (
+                    <TableRow key={ia.id}>
+                      <TableCell>{ia.name}</TableCell>
+                      <TableCell>{ia.provider}</TableCell>
+                      <TableCell>{ia.model}</TableCell>
+                      <TableCell>{ia.version}</TableCell>
+                      <TableCell>
+                        {" "}
+                        {new Date(ia.createdAt).toLocaleDateString("es-ES")}
+                      </TableCell>
+                      <TableCell className="py-3">
+                        <Badge
+                          variant={
+                            ia.isDeleted
+                              ? "destructive"
+                              : ia.status
+                              ? "success"
+                              : "secondary"
+                          }
+                          className="block text-center"
+                        >
+                          {ia.isDeleted
+                            ? "Eliminado"
                             : ia.status
-                            ? "success"
-                            : "secondary"
-                        }
-                        className="block text-center"
-                      >
-                        {ia.isDeleted
-                          ? "Eliminado"
-                          : ia.status
-                          ? "En uso"
-                          : "Sin uso"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {ia.isDeleted ? (
-                        <span className="text-red-500 font-semibold">
-                          Eliminado
-                        </span>
-                      ) : (
-                        <span className="text-blue-600 font-semibold">
-                          Listo para usar
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          // onClick={() => }
-                        >
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Editar</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Eliminar"
-                          onClick={async () => {
-                            {
-                              await handelConfirmDelete(ia.id, ia.name);
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Eliminar</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                            ? "En uso"
+                            : "Sin uso"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {ia.isDeleted ? (
+                          <span className="text-red-500 font-semibold">
+                            Eliminado
+                          </span>
+                        ) : (
+                          <span className="text-blue-600 font-semibold">
+                            Listo para usar
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              handelActivarModelIA(ia);
+                            }}
+                            title={ia.status ? "Desactivar" : "Activar"}
+                            className={`text-${
+                              ia.status ? "green-400" : "gray-500"
+                            } hover:text-${
+                              ia.status ? "green-600" : "gray-700"
+                            }`}
+                            aria-label={ia.status ? "Desactivar" : "Activar"}
+                          >
+                            <span className="sr-only">
+                              {ia.status ? "Desactivar" : "Activar"}
+                            </span>
+                            {ia.status ? (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M9 12l2 2l4-4m5 2a9 9 0 11-18 0a9 9 0 0118 0z"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6.5 12h11m-5.5 7V5"
+                                />
+                              </svg>
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            // onClick={() => }
+                          >
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Editar</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Eliminar"
+                            onClick={async () => {
+                              {
+                                await handelConfirmDelete(ia.id, ia.name);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Eliminar</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
               )}
             </TableBody>
           </Table>
