@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   ChevronLeft,
   ChevronRight,
-  Download,
   Edit,
   Plus,
   Search,
@@ -29,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SetStateAction, useEffect } from "react";
+import { useEffect } from "react";
 import { UserService } from "@/app/backend/users/apiUser";
 import { useState } from "react";
 import LoadingCircles from "@/components/ui/loading";
