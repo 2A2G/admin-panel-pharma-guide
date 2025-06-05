@@ -25,7 +25,7 @@ const LoadingCircles = ({ color = "#3B82F6" }) => {
           />
         ))}
       </div>
-      <p className="mt-2 text-sm text-gray-600">Cargando datos...</p>
+      <p className="mt-2 text-sm text-gray-600">Cargando...</p>
     </div>
   );
 };
