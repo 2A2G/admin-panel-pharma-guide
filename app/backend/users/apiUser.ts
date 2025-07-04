@@ -1,7 +1,6 @@
 import axios from "axios";
 import { AccessTokenService } from "../../api/accesToken";
 import { headers } from "next/headers";
-import { error } from "console";
 
 const urlBas = process.env.NEXT_PUBLIC_API_URL || "https://api.ejemplo.com";
 const urlBase = `${urlBas}/api/pharma-guide/users`;

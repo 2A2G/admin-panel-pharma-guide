@@ -10,7 +10,7 @@ export class AccesService {
       const response = await axios.post(this.url, credentials);
 
       if (response.status === 200) {
-        const token = response.data;
+        const token = response.data.token;
         if (!token) {
           throw new Error("Token no recibido");
         }
